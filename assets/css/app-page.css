@@ -1,0 +1,272 @@
+/*!
+ * milanelsen.com
+ * Copyright 2021 Milan Elsen
+ * Created by Milan Elsen on 05.03.21.
+ */
+
+.iphone-screenshot {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+	text-align: center;
+    margin-bottom: 60px;
+    width: 349px;
+}
+
+.half-screenshot {
+	margin-left: 20px;
+	margin-top: 10px;
+    width: 300px;
+}
+
+@media only screen and (max-width: 360px) {
+.half-screenshot {
+	margin-left: 10px;
+	margin-top: 10px;
+    width: 240px;
+}
+}
+
+@media (max-width: 767.98px) {
+        .app-info :nth-child(1) { order: 2; }
+        
+        .iphone-screenshot {
+     		margin-top: 60px;
+		}
+		
+		.app-icon {
+ 		  	width: 40px;
+   			height: 40px;
+		}
+
+}
+
+
+.app-icon {
+	width: auto;
+	height: auto;
+    max-width: 100px;
+    max-height: 100px;
+    min-width: 40px;
+    min-height: 40px;
+    margin-bottom: 20px;
+}
+
+.app-description {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left:15px;
+    align-self: top !important;
+    
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width:100%
+    
+}
+
+.feature-title {
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+.features {
+    grid-area: c;
+    display: flex;
+    flex: 0 1 auto;
+    align-content: flex-start;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    margin-top:93px
+}
+
+.feature {
+    display: flex;
+    padding-top: 63px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width:calc(100%/3)
+}
+
+.feature:nth-child(-n + 3) {
+    padding-top:0px
+}
+
+.feature:nth-child(3n) {
+    padding-right:0px
+}
+
+.feature:nth-child(3n + 1) {
+    padding-left:0px
+}
+
+.iconBack {
+    color:#e6e6e6
+}
+
+.iconTop {
+    color:#1d63ea
+}
+
+.socialIconBack {
+    color:#e6e6e6
+}
+
+.socialIconTop {
+    color:#666
+}
+
+.featureText {
+    margin-left:18px
+}
+
+.featureText > p {
+    margin-top: 8px;
+    line-height:1.5
+}
+
+@media only screen and (max-width: 992px) {
+	.app-info {
+     	width: 100%;
+	}
+
+    .features {
+        flex-grow: 1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top:11px
+    }
+    
+    .feature {
+        display: flex;
+        padding-top: 41px;
+        padding-left: 15px;
+        padding-right: 15px;
+        width:100%;
+    }
+    
+    .feature:nth-child(-n + 3) {
+        padding-top:41px
+    }
+    
+    .feature:nth-child(1) {
+        padding-top:0px
+    }
+    
+    .feature:nth-child(3n) {
+        padding-right:15px
+    }
+    
+    .feature:nth-child(3n + 1) {
+        padding-left:15px
+    }
+    
+    .iphone-screenshot {
+		display: block;
+ 		margin-bottom: 60px;
+		width: 349px;
+	}
+
+}
+
+@media only screen and (max-width: 375px) {
+    .features {
+        flex-grow: 1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top:11px
+    }
+    
+    .feature {
+        display: flex;
+        padding-top: 41px;
+        padding-left: 0px;
+        padding-right: 0px;
+        width:100%
+    }
+    
+    .feature:nth-child(-n + 3) {
+        padding-top:41px
+    }
+    
+    .feature:nth-child(1) {
+        padding-top:0px
+    }
+    
+    .feature:nth-child(3n) {
+        padding-right:0px
+    }
+    
+    .feature:nth-child(3n + 1) {
+        padding-left:0px
+    }
+    
+    .iphone-screenshot {
+		display: block;
+ 		margin-bottom: 60px;
+		width: 349px;
+		max-width: 100%;
+	}
+}
+
+.fa-stack {
+    display: inline-block;
+    height: 2em;
+    line-height: 2em;
+    position: relative;
+    vertical-align: middle;
+    width: 2.5em;
+    color: white;
+	justify-content: center;
+	align-items: center;
+}
+
+
+all.css:1:303.fa-1x {
+    font-size: 1em;
+}
+
+.madewith-section {
+	font-family: "SF Mono", "Roboto Mono", "Courier", "Andale Mono", monospace;
+    color: #86868b;
+} 
+
+.icon {
+	fill: white;
+}
+
+.circle {
+	margin-top: 1em;
+    display: flex;
+    height: 2.2rem;
+    width: 2.2rem;
+    background-color: #86868b;
+    border-radius: 50%;
+    z-index: -1;
+    justify-content: center;
+	align-items: center;
+}
+
+ul.noindent{
+   margin: 0;
+   padding: 0; /* Set the distance from the list edge to 1x the font size */
+   list-style-position: outside;
+   list-style-image: none;
+}
+
+.madewith-listitem {
+	margin-left: 0;
+	font-weight: 800;
+}
+
+html, body {
+    max-width: 100%;
+}
