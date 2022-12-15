@@ -9,7 +9,8 @@
     --breakpoint-md: 768px;
     --breakpoint-lg: 992px;
     --breakpoint-xl: 1200px;
-    --font-family-sans-serif:  "Helvetica Neue", -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Arial, "Noto Sans", -sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-family-header: futura, "Helvetica Neue", -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Arial, "Noto Sans", -sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	--font-family-body: "Helvetica Neue", -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Arial, "Noto Sans", -sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
@@ -18,7 +19,7 @@
 }
 
 html {
-    font-family: var(--font-family-sans-serif);
+    font-family: var(--font-family-header);
     line-height: 1.15;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color:transparent
@@ -30,13 +31,16 @@ footer, header, nav, privacy-policy-section, section {
 
 body {
     margin: 0;
-    font-family: var(--font-family-sans-serif);
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
+    font-family: var(--font-family-header);
+    font-weight: 300;
     color: #212529;
     text-align: left;
-    background-color: #fff
+    background-color: #fff;    
+font-style: normal;
+letter-spacing: 0em;
+text-transform: none;
+font-size: 1rem;
+line-height: 1.8;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {
@@ -44,6 +48,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-header);
     margin-top: 1rem;
     margin-bottom:.5rem
 }
@@ -85,8 +90,31 @@ a:not([href]), a:not([href]):hover {
     text-decoration:underline
 }
 
+.maillink {
+    color: #FFFF;
+    text-decoration:underline
+}
+
+.maillink:hover {
+    color: #FFFF;
+    text-decoration:none
+}
+
+
 img {
     border-style:none
+      position: absolute;
+top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: normal;
+
+  --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px);
+--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 );
+--inset-padding: 0vw;
+--row-height-scaling-factor: 0.0215;
+--container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));
 }
 
 img {
@@ -1159,26 +1187,6 @@ a.text-light:focus, a.text-light:hover {
     }
 }
 
-body {
-    font-family: var(--font-family-sans-serif);
-    position: relative;
-    color: #fff;
-    background-color:#000
-}
-
-body, html {
-    width: 100%;
-    height:100%
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-family-sans-serif);
-    font-weight: 700;
-    margin: 0 0 35px;
-    letter-spacing: 1px;
-    text-transform:uppercase
-}
-
 p {
     font-size: 16px;
     line-height: 1.5;
@@ -1204,7 +1212,7 @@ a:focus, a:hover {
 }
 
 #mainNav {
-    font-family: var(--font-family-sans-serif);
+    font-family: var(--font-family-body);
     font-weight: 700;
     margin-bottom: 0;
     text-transform: uppercase;
@@ -1334,7 +1342,7 @@ img::-moz-selection {
 }
 
 .privacy-policy-section {
-    font-family: var(--font-family-sans-serif);
+    font-family: var(--font-family-body);
     max-width: 800px;
     margin: 0 auto;
     padding-top: 150px;
@@ -1345,7 +1353,7 @@ img::-moz-selection {
 }
 
 .privacy-policy-section.p {
-    font-family: var(--font-family-sans-serif);
+    font-family: var(--font-family-body);
 }
 
 #copyright {
@@ -1354,7 +1362,7 @@ img::-moz-selection {
 }
 
 .imprint-section {
-    font-family: var(--font-family-sans-serif);
+    font-family: var(--font-family-body);
     max-width: 800px;
     margin: 0 auto;
     padding-top: 150px;
@@ -1470,6 +1478,15 @@ svg.tiktok {
 }    
 
 .about {
+font-weight: 600;
+line-height: 1.2em;
+font-family: --font-family-body;
+font-weight: 500;
+font-style: normal;
+letter-spacing: 0em;
+text-transform: none;
+line-height: 1.4em;
+font-size: 2rem;
     //margin-right: 10%;
     
     position: relative;
