@@ -1,0 +1,42 @@
+
+.social-link-me {
+    text-align: center;
+    justify-content: center; align-items: center;
+}
+
+.social-mail:hover {
+    transition: fill .2s ease-in-out;
+    fill:#007AFF
+}
+
+.social-mast:hover {
+    transition: fill .2s ease-in-out;
+    
+    fill:#6364FF
+}
+
+.social-insta:hover {
+    transition: fill .2s ease-in-out;
+    fill: url(#insta-gradient) #962FBF;
+}
+
+.social-snap:hover {
+    transition: fill .2s ease-in-out;
+    
+    fill:#fffc00
+}
+
+.social-github-milan-elsen:hover {
+	transition: fill .2s ease-in-out;
+    
+	fill:#666666
+}
+
+.overflow1 { transition: all .2s ease-in-out; }
+.overflow2 { transition: all .2s ease-in-out; }
+#stackoverflow-link:hover polygon.overflow1 { fill: #BBBBBB; }
+#stackoverflow-link:hover path.overflow2 { fill: #F58025; }
+
+svg.social {
+	padding: 15px
+}
