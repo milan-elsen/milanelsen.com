@@ -41,11 +41,6 @@
 
 }
 
-#bottom-fixed {
-        position: absolute;
-        bottom: 0;
-		height: 100%
-}
 
 .app-icon {
 	width: auto;
@@ -88,7 +83,7 @@
     justify-content: flex-start;
     flex-grow: 1;
     flex-wrap: wrap;
-    margin-top:93px
+    margin-top:93px;
 }
 
 .feature {
@@ -96,7 +91,7 @@
     padding-top: 63px;
     padding-left: 15px;
     padding-right: 15px;
-    width:calc(100%/3)
+    width:28%
 }
 
 .iconBack {
@@ -120,7 +115,7 @@
     display: block;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 768px) {
 	.app-info {
      	width: 100%;
 	}
@@ -230,6 +225,12 @@ all.css:1:303.fa-1x {
 	fill: white;
 }
 
+.icon-madeWith {
+	color: black;
+	font-weight: bold;
+}
+
+
 .circle {
 	margin-top: 1em;
     display: flex;
@@ -279,25 +280,6 @@ html, body {
     margin-top:93px
 }
 
-.feature {
-    display: flex;
-    padding-top: 63px;
-    padding-left: 15px;
-    padding-right: 15px;
-    width:calc(100%/3)
-}
-
-.feature:nth-child(-n + 3) {
-    padding-top:0px
-}
-
-.feature:nth-child(3n) {
-    padding-right:0px
-}
-
-.feature:nth-child(3n + 1) {
-    padding-left:0px
-}
 
 .fe-639a3ae5bc1749234cf1c48e {
   --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);
