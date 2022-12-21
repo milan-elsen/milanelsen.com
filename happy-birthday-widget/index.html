@@ -584,51 +584,50 @@
   
     
 
-<section data-test="page-section" data-section-theme="" class="page-section
-    
-      full-bleed-section
-      layout-engine-section
-    
-    background-width--full-bleed
-    
-      
-        section-height--custom
-      
-    
-    
-      content-width--wide
-    
+<section data-test="page-section" data-section-theme="" class='page-section
+    full-bleed-section
+    layout-engine-section
+	background-width--full-bleed
+    section-height--small
+    content-width--wide
     horizontal-alignment--center
-    vertical-alignment--middle
-    
-      
-    
-    
-    " data-section-id="639a39504389b672d622736c" data-controller="SectionWrapperController" data-current-styles="{
-    &quot;imageOverlayOpacity&quot;: 0.15,
-    &quot;backgroundWidth&quot;: &quot;background-width--full-bleed&quot;,
-    &quot;sectionHeight&quot;: &quot;section-height--custom&quot;,
-    &quot;customSectionHeight&quot;: 0,
-    &quot;horizontalAlignment&quot;: &quot;horizontal-alignment--center&quot;,
-    &quot;verticalAlignment&quot;: &quot;vertical-alignment--middle&quot;,
-    &quot;contentWidth&quot;: &quot;content-width--wide&quot;,
-    &quot;customContentWidth&quot;: 50,
-    &quot;backgroundColor&quot;: &quot;&quot;,
-    &quot;sectionTheme&quot;: &quot;&quot;,
-    &quot;sectionAnimation&quot;: &quot;none&quot;,
-    &quot;backgroundMode&quot;: &quot;image&quot;
-  }" data-current-context="{
-    &quot;video&quot;: {
-      &quot;playbackSpeed&quot;: 0.5,
-      &quot;filter&quot;: 1,
-      &quot;filterStrength&quot;: 0,
-      &quot;zoom&quot;: 0,
-      &quot;videoSourceProvider&quot;: &quot;none&quot;
-    },
-    &quot;backgroundImageId&quot;: null,
-    &quot;backgroundMediaEffect&quot;: null,
-    &quot;typeName&quot;: &quot;page&quot;
-  }" data-animation="none" data-fluid-engine-section="" style="padding-top: 80.7667px;" data-controllers-bound="SectionWrapperController" id="yui_3_17_2_1_1671125638820_78" data-active="true">
+    vertical-alignment--bottom'
+  
+  data-section-id="639a39504389b672d622736c"
+  data-controller="SectionWrapperController"
+  data-current-styles="{
+            &quot;imageOverlayOpacity&quot;: 0.15,
+            &quot;backgroundWidth&quot;: &quot;background-width--full-bleed&quot;,
+            &quot;sectionHeight&quot;: &quot;section-height--small&quot;,
+            &quot;customSectionHeight&quot;: 1,
+            &quot;horizontalAlignment&quot;: &quot;horizontal-alignment--center&quot;,
+            &quot;verticalAlignment&quot;: &quot;vertical-alignment--bottom&quot;,
+            &quot;contentWidth&quot;: &quot;content-width--wide&quot;,
+            &quot;customContentWidth&quot;: 50,
+            &quot;backgroundColor&quot;: &quot;&quot;,
+            &quot;sectionTheme&quot;: &quot;&quot;,
+            &quot;sectionAnimation&quot;: &quot;none&quot;,
+            &quot;backgroundMode&quot;: &quot;image&quot;
+          }"
+  data-current-context="{
+            &quot;video&quot;: {
+              &quot;playbackSpeed&quot;: 0.5,
+              &quot;filter&quot;: 1,
+              &quot;filterStrength&quot;: 0,
+              &quot;zoom&quot;: 0,
+              &quot;videoSourceProvider&quot;: &quot;none&quot;
+            },
+            &quot;backgroundImageId&quot;: null,
+            &quot;backgroundMediaEffect&quot;: {
+              &quot;type&quot;: &quot;none&quot;
+            },
+            &quot;typeName&quot;: &quot;page&quot;
+          }"
+  data-animation="none"
+  data-fluid-engine-section
+  style='    height: 100vh;
+'>
+  
   <div class="section-border">
     <div class="section-background">
     
@@ -636,30 +635,28 @@
     
     </div>
   </div>
-  <div class="content-wrapper" style="
-      
-        
-          
-          
-          padding-top: calc(0vmax / 10); padding-bottom: calc(0vmax / 10);
-        
-      
-    " id="yui_3_17_2_1_1671125638820_77">
-    <div class="content" id="yui_3_17_2_1_1671125638820_76">
+  <div
+    class="content-wrapper"
+    style='
+        position: absolute;
+        bottom: 0;
+    '
+  >
+    <div class="content" style='padding-bottom: 20px'>
       
       
       
       
       
       
-      <div data-fluid-engine="true" id="yui_3_17_2_1_1671125638820_75"><style>.fe-639a39504389b672d622736b {
+      <div data-fluid-engine="true"><style>.fe-639a39504389b672d622736b {
   --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);
   --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 );
 
   display: grid;
   position: relative;
   grid-area: 1/1/-1/-1;
-  grid-template-rows: repeat(14,minmax(24px, auto));
+  grid-template-rows: repeat(22,minmax(24px, auto));
   grid-template-columns:
     minmax(var(--grid-gutter), 1fr)
     repeat(8, minmax(0, var(--cell-max-width)))
@@ -681,7 +678,7 @@
     --row-height-scaling-factor: 0.0215;
     --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));
 
-    grid-template-rows: repeat(15,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));
+    grid-template-rows: repeat(16,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));
     grid-template-columns:
       minmax(var(--grid-gutter), 1fr)
       repeat(24, minmax(0, var(--cell-max-width)))
@@ -705,21 +702,21 @@
 
   @media (min-width: 768px) {
     .fe-block-2226c19801479943acce {
-      grid-area: 4/18/14/24;
-      z-index: 4;
+      grid-area: 5/15/17/26;
+      z-index: 3;
     }
 
     .fe-block-2226c19801479943acce .sqs-block {
-      justify-content: center;
+      justify-content: flex-end;
     }
 
     .fe-block-2226c19801479943acce .sqs-block-alignment-wrapper {
-      align-items: center;
+      align-items: flex-end;
     }
   }
 
   .fe-block-7e52ad5e425f47d348e8 {
-    grid-area: 11/2/13/9;
+    grid-area: 11/2/17/9;
     z-index: 0;
   }
 
@@ -733,7 +730,7 @@
 
   @media (min-width: 768px) {
     .fe-block-7e52ad5e425f47d348e8 {
-      grid-area: 11/3/14/16;
+      grid-area: 13/2/17/12;
       z-index: 1;
     }
 
@@ -747,7 +744,7 @@
   }
 
   .fe-block-yui_3_17_2_1_1671050070345_66140 {
-    grid-area: 13/2/15/10;
+    grid-area: 17/2/19/10;
     z-index: 3;
   }
 
@@ -761,76 +758,79 @@
 
   @media (min-width: 768px) {
     .fe-block-yui_3_17_2_1_1671050070345_66140 {
-      grid-area: 2/8/5/24;
+      grid-area: 2/7/5/25;
       z-index: 2;
     }
 
     .fe-block-yui_3_17_2_1_1671050070345_66140 .sqs-block {
-      justify-content: flex-start;
+      justify-content: flex-end;
     }
 
     .fe-block-yui_3_17_2_1_1671050070345_66140 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
+      align-items: flex-end;
     }
   }
 
-</style><div class="fluid-engine fe-639a39504389b672d622736b" id="yui_3_17_2_1_1671125638820_74"><div class="fe-block fe-block-2226c19801479943acce" id="yui_3_17_2_1_1671125638820_73"><div class="sqs-block image-block sqs-block-image sqs-stretched sqs-text-ready" data-aspect-ratio="109.69469737546866" data-block-type="5" id="block-2226c19801479943acce"><div class="sqs-block-content" id="yui_3_17_2_1_1671125638820_72" style="height: 100%; width: 100%;">
+  .fe-block-yui_3_17_2_1_1671402588958_112402 {
+    grid-area: 19/2/21/10;
+    z-index: 5;
+  }
 
+  .fe-block-yui_3_17_2_1_1671402588958_112402 .sqs-block {
+    justify-content: flex-start;
+  }
 
+  .fe-block-yui_3_17_2_1_1671402588958_112402 .sqs-block-alignment-wrapper {
+    align-items: flex-start;
+  }
 
+  @media (min-width: 768px) {
+    .fe-block-yui_3_17_2_1_1671402588958_112402 {
+      grid-area: 1/20/3/25;
+      z-index: 5;
+    }
 
+    .fe-block-yui_3_17_2_1_1671402588958_112402 .sqs-block {
+      justify-content: center;
+    }
 
+    .fe-block-yui_3_17_2_1_1671402588958_112402 .sqs-block-alignment-wrapper {
+      align-items: center;
+    }
+  }
 
+</style>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-    
-  
-    <div class="image-block-outer-wrapper layout-caption-below design-layout-fluid image-position-center combination-animation-site-default individual-animation-site-default sqs-narrow-width animation-loaded" data-test="image-block-fluid-outer-wrapper" id="yui_3_17_2_1_1671125638820_71">
-      <div class="fluid-image-animation-wrapper sqs-image sqs-block-alignment-wrapper" data-animation-role="image" id="yui_3_17_2_1_1671125638820_70">
-        <div class="fluid-image-container sqs-image-content" style="overflow: hidden;position: relative;width: 100%;height: 100%;" id="yui_3_17_2_1_1671125638820_69">
-          
-
-          
-          
-
-          
-            
-              <div class="content-fill" id="yui_3_17_2_1_1671125638820_65" style="overflow: hidden;">
-                
-            
+<div class="fluid-engine fe-639a39504389b672d622736b">
+<div class="fe-block fe-block-2226c19801479943acce">
+<div class="sqs-block image-block sqs-block-image sqs-stretched" data-block-type="5" id="block-2226c19801479943acce">
+<div class="sqs-block-content">
+    <div class="
+        image-block-outer-wrapper
+        layout-caption-below
+        design-layout-fluid
+        image-position-right
+        combination-animation-site-default
+        individual-animation-site-default
+      "
+      data-test="image-block-fluid-outer-wrapper">
+      <div class="fluid-image-animation-wrapper sqs-image sqs-block-alignment-wrapper"
+        data-animation-role="image">
+        <div class="fluid-image-container sqs-image-content" style="overflow: hidden;position: relative;width: 100%;height: 100%;">
+                      
+              <div class="content-fit">
               <noscript>
-                <img src="../milanelsen.com_files/img/iphone-screenshot.png" alt="" loading="lazy" style="
-                  object-fit: cover;
+                <img src="https://milanelsen.com/milanelsen.com_files/img/iphone-screenshot.png" alt="" loading="lazy" style="
+                  object-fit: contain;
                   object-position: calc(0.5 * 100%) calc(0.5 * 100%);
                 "/>
               </noscript>
-              <img data-src="../milanelsen.com_files/img/iphone-screenshot.png" data-image="../milanelsen.com_files/img/iphone-screenshot.png" data-image-dimensions="1024x683" data-image-focal-point="0.5,0.5" alt="" loading="lazy" data-stretch="true" style="object-fit: cover; object-position: calc(50%) calc(50%); left: -116.63px; top: 0px; width: 490.261px; height: 327px; position: relative;" data-parent-ratio="0.8" class="loaded" data-image-resolution="1000w" src="../milanelsen.com_files/img/iphone-screenshot.png">
+              <img
+                data-src="https://milanelsen.com/milanelsen.com_files/img/iphone-screenshot.png" data-image="https://milanelsen.com/milanelsen.com_files/img/iphone-screenshot.png" data-image-dimensions="1350x1012" data-image-focal-point="0.5,0.5" alt="" 
+                loading="lazy"
+                data-stretch="false"
+                style="object-fit: contain;object-position: calc(0.5 * 100%) calc(0.5 * 100%);"
+              />
             
             <div class="fluidImageOverlay"></div>
           
@@ -915,12 +915,31 @@
 
 </div></div></div><div class="fe-block fe-block-7e52ad5e425f47d348e8"><div class="sqs-block html-block sqs-block-html" data-block-type="2" id="block-7e52ad5e425f47d348e8"><div class="sqs-block-content">
 
-<p class="" style="white-space:pre-wrap;">Never forget a birthday again. Happy Birthday Widget lets you see them right on your Home Screen. Happy Birthday Widgets comes with a variety of themes and sizes to fit your style and home screen aesthetic.</p>
+<p class="" style="white-space:pre-wrap;"><em>Never forget a birthday again!</em></p><p class="" style="white-space:pre-wrap;">Happy Birthday Widget lets you see birthdays right on your Home Screen. Happy Birthday Widget comes with a variety of themes and sizes to fit your personal style.</p>
 
 
 </div></div></div><div class="fe-block fe-block-yui_3_17_2_1_1671050070345_66140"><div class="sqs-block html-block sqs-block-html" data-block-type="2" id="block-yui_3_17_2_1_1671050070345_66140"><div class="sqs-block-content">
 
-<div class="sqsrte-scaled-text-container loaded"><span class="sqsrte-scaled-text" style="font-size: 65.2px;"><h1 style="white-space:pre-wrap;"><strong>Happy Birthday Widget</strong></h1></span></div>
+<h1 style="text-align:right;white-space:pre-wrap;"><strong>Happy Birthday Widget</strong></h1>
+
+
+</div></div></div><div class="fe-block fe-block-yui_3_17_2_1_1671402588958_112402"><div class="sqs-block html-block sqs-block-html sqs-background-enabled" data-block-type="2" id="block-yui_3_17_2_1_1671402588958_112402"><div class="sqs-block-content">
+
+<h3 style="text-align:center;white-space:pre-wrap;"><span class="sqsrte-text-color--white"><strong>iOS + iPadOS</strong></span></h3>
+
+
+
+
+
+
+<style>
+  #block-yui_3_17_2_1_1671402588958_112402.sqs-block.sqs-background-enabled {
+    box-sizing: border-box;
+    height: 100%;
+    padding: 2% 2% 2% 2%;
+    border-radius: 18px 18px 18px 18px;
+  }
+</style>
 
 
 </div></div></div></div></div>
@@ -928,7 +947,6 @@
   </div>
   
 </section>
-
   
     
 
@@ -994,127 +1012,7 @@
       
       
       
-      <div data-fluid-engine="true"><style>.fe-639a3ae5bc1749234cf1c48e {
-  --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);
-  --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 );
-
-  display: grid;
-  position: relative;
-  grid-area: 1/1/-1/-1;
-  grid-template-rows: repeat(47,minmax(24px, auto));
-  grid-template-columns:
-    minmax(var(--grid-gutter), 1fr)
-    repeat(8, minmax(0, var(--cell-max-width)))
-    minmax(var(--grid-gutter), 1fr);
-  row-gap: 11.0px;
-  column-gap: 11.0px;
-}
-
-@media (min-width: 768px) {
-  .background-width--inset .fe-639a3ae5bc1749234cf1c48e {
-    --inset-padding: calc(var(--sqs-site-gutter) * 2);
-  }
-
-  .fe-639a3ae5bc1749234cf1c48e {
-    --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px);
-    --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 );
-    --inset-padding: 0vw;
-
-    --row-height-scaling-factor: 0.0215;
-    --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));
-
-    grid-template-rows: repeat(16,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));
-    grid-template-columns:
-      minmax(var(--grid-gutter), 1fr)
-      repeat(24, minmax(0, var(--cell-max-width)))
-      minmax(var(--grid-gutter), 1fr);
-  }
-}
-
-
-  .fe-block-a44ecf12ba20e58ee8a3 {
-    grid-area: 1/2/14/10;
-    z-index: 1;
-  }
-
-  .fe-block-a44ecf12ba20e58ee8a3 .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-a44ecf12ba20e58ee8a3 .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-a44ecf12ba20e58ee8a3 {
-      grid-area: 1/2/16/10;
-      z-index: 1;
-    }
-
-    .fe-block-a44ecf12ba20e58ee8a3 .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-a44ecf12ba20e58ee8a3 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-507ac49f99e9652ccd52 {
-    grid-area: 15/2/31/10;
-    z-index: 2;
-  }
-
-  .fe-block-507ac49f99e9652ccd52 .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-507ac49f99e9652ccd52 .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-507ac49f99e9652ccd52 {
-      grid-area: 1/10/16/18;
-      z-index: 2;
-    }
-
-    .fe-block-507ac49f99e9652ccd52 .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-507ac49f99e9652ccd52 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-ea0d411dc4cf89c84de2 {
-    grid-area: 32/2/48/10;
-    z-index: 3;
-  }
-
-  .fe-block-ea0d411dc4cf89c84de2 .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-ea0d411dc4cf89c84de2 .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-ea0d411dc4cf89c84de2 {
-      grid-area: 1/18/8/26;
-      z-index: 3;
-    }
-
-    .fe-block-ea0d411dc4cf89c84de2 .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-ea0d411dc4cf89c84de2 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
+      <div data-fluid-engine="true"><style>
 
 </style><div class="fluid-engine fe-639a3ae5bc1749234cf1c48e"><div class="fe-block fe-block-a44ecf12ba20e58ee8a3"><div class="sqs-block html-block sqs-block-html" data-block-type="2" id="block-a44ecf12ba20e58ee8a3"><div class="sqs-block-content">
 
@@ -1339,213 +1237,7 @@ Black, Candy, Dusk, Lightning, Midnight, Ocean, Peach, Sunflower & more</p>
       
       
       
-      <div data-fluid-engine="true"><style>.fe-639a3cb37c40754f7bc03bd6 {
-  --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);
-  --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 );
-
-  display: grid;
-  position: relative;
-  grid-area: 1/1/-1/-1;
-  grid-template-rows: repeat(19,minmax(24px, auto));
-  grid-template-columns:
-    minmax(var(--grid-gutter), 1fr)
-    repeat(8, minmax(0, var(--cell-max-width)))
-    minmax(var(--grid-gutter), 1fr);
-  row-gap: 11.0px;
-  column-gap: 11.0px;
-}
-
-@media (min-width: 768px) {
-  .background-width--inset .fe-639a3cb37c40754f7bc03bd6 {
-    --inset-padding: calc(var(--sqs-site-gutter) * 2);
-  }
-
-  .fe-639a3cb37c40754f7bc03bd6 {
-    --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px);
-    --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 );
-    --inset-padding: 0vw;
-
-    --row-height-scaling-factor: 0.0215;
-    --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));
-
-    grid-template-rows: repeat(12,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));
-    grid-template-columns:
-      minmax(var(--grid-gutter), 1fr)
-      repeat(24, minmax(0, var(--cell-max-width)))
-      minmax(var(--grid-gutter), 1fr);
-  }
-}
-
-
-  .fe-block-511090b6853b88b2348f {
-    grid-area: 1/2/5/10;
-    z-index: 1;
-  }
-
-  .fe-block-511090b6853b88b2348f .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-511090b6853b88b2348f .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-511090b6853b88b2348f {
-      grid-area: 1/2/4/13;
-      z-index: 1;
-    }
-
-    .fe-block-511090b6853b88b2348f .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-511090b6853b88b2348f .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-40144255b79e9daa6685 {
-    grid-area: 6/6/10/10;
-    z-index: 7;
-  }
-
-  .fe-block-40144255b79e9daa6685 .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-40144255b79e9daa6685 .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-40144255b79e9daa6685 {
-      grid-area: 5/18/11/21;
-      z-index: 7;
-    }
-
-    .fe-block-40144255b79e9daa6685 .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-40144255b79e9daa6685 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-5a0c95453596e52f731f {
-    grid-area: 6/2/10/6;
-    z-index: 6;
-  }
-
-  .fe-block-5a0c95453596e52f731f .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-5a0c95453596e52f731f .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-5a0c95453596e52f731f {
-      grid-area: 5/15/11/18;
-      z-index: 6;
-    }
-
-    .fe-block-5a0c95453596e52f731f .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-5a0c95453596e52f731f .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-9d0d6cc492c7a16596bb {
-    grid-area: 10/2/13/10;
-    z-index: 5;
-  }
-
-  .fe-block-9d0d6cc492c7a16596bb .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-9d0d6cc492c7a16596bb .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-9d0d6cc492c7a16596bb {
-      grid-area: 4/14/5/23;
-      z-index: 5;
-    }
-
-    .fe-block-9d0d6cc492c7a16596bb .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-9d0d6cc492c7a16596bb .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-42ec4e3b03916919e6c5 {
-    grid-area: 13/2/16/10;
-    z-index: 6;
-  }
-
-  .fe-block-42ec4e3b03916919e6c5 .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-42ec4e3b03916919e6c5 .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-42ec4e3b03916919e6c5 {
-      grid-area: 11/14/12/23;
-      z-index: 6;
-    }
-
-    .fe-block-42ec4e3b03916919e6c5 .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-42ec4e3b03916919e6c5 .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-  .fe-block-a287f796dd1af6723aea {
-    grid-area: 16/6/20/10;
-    z-index: 8;
-  }
-
-  .fe-block-a287f796dd1af6723aea .sqs-block {
-    justify-content: flex-start;
-  }
-
-  .fe-block-a287f796dd1af6723aea .sqs-block-alignment-wrapper {
-    align-items: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .fe-block-a287f796dd1af6723aea {
-      grid-area: 5/21/11/24;
-      z-index: 8;
-    }
-
-    .fe-block-a287f796dd1af6723aea .sqs-block {
-      justify-content: flex-start;
-    }
-
-    .fe-block-a287f796dd1af6723aea .sqs-block-alignment-wrapper {
-      align-items: flex-start;
-    }
-  }
-
-</style><div class="fluid-engine fe-639a3cb37c40754f7bc03bd6"><div class="fe-block fe-block-511090b6853b88b2348f"><div class="sqs-block html-block sqs-block-html" data-block-type="2" id="block-511090b6853b88b2348f"><div class="sqs-block-content">
+      <div data-fluid-engine="true"><style></style><div class="fluid-engine fe-639a3cb37c40754f7bc03bd6"><div class="fe-block fe-block-511090b6853b88b2348f"><div class="sqs-block html-block sqs-block-html" data-block-type="2" id="block-511090b6853b88b2348f"><div class="sqs-block-content">
 
 <h1 style="white-space:pre-wrap;"><span class="sqsrte-text-color--white">How it is built</span></h1>
 
@@ -1671,67 +1363,9 @@ CoreData
     
     </div>
   </div>
-  <div
-    class="content-wrapper"
-    style='
-      
-        
-          
-          
-          padding-top: calc(10vmax / 10); padding-bottom: calc(10vmax / 10);
-        
-      
-    '
-  >
-    <div
-      class="content"
-      
-    >
-      
-      
-      
-      
-      
-      
-      <div data-fluid-engine="true"><style>.fe-639b6c45fdbfd62b5e47e96c {
-  --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);
-  --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 );
-
-  display: grid;
-  position: relative;
-  grid-area: 1/1/-1/-1;
-  grid-template-rows: repeat(2,minmax(24px, auto));
-  grid-template-columns:
-    minmax(var(--grid-gutter), 1fr)
-    repeat(8, minmax(0, var(--cell-max-width)))
-    minmax(var(--grid-gutter), 1fr);
-  row-gap: 11.0px;
-  column-gap: 11.0px;
-}
-
-@media (min-width: 768px) {
-  .background-width--inset .fe-639b6c45fdbfd62b5e47e96c {
-    --inset-padding: calc(var(--sqs-site-gutter) * 2);
-  }
-
-  .fe-639b6c45fdbfd62b5e47e96c {
-    --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px);
-    --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 );
-    --inset-padding: 0vw;
-
-    --row-height-scaling-factor: 0.0215;
-    --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));
-
-    grid-template-rows: repeat(2,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));
-    grid-template-columns:
-      minmax(var(--grid-gutter), 1fr)
-      repeat(24, minmax(0, var(--cell-max-width)))
-      minmax(var(--grid-gutter), 1fr);
-  }
-}
-
-
-</style><div class="fluid-engine fe-639b6c45fdbfd62b5e47e96c"></div></div>
+  <div class="content-wrapper" style='padding-top: calc(10vmax / 10); padding-bottom: calc(10vmax / 10);'>
+    <div class="content">
+      <div data-fluid-engine="true"><style></style><div class="fluid-engine fe-639b6c45fdbfd62b5e47e96c"></div></div>
     </div>
   </div>
   
@@ -1767,7 +1401,6 @@ CoreData
             sectionBackground.style.top = '';
           }
         }
-        //# sourceURL=headerPositioning.js
       </script>
 
       
