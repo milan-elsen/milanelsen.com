@@ -258,8 +258,8 @@ to {
     font-family: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     line-height: 1.2em;
-    font-family: futura-pt;
-    font-weight: 500;
+    font-family: Lexend;
+    font-weight: 800;
     font-style: normal;
     letter-spacing: 0em;
     text-transform: none;
@@ -310,10 +310,10 @@ p {
 }
 .header-title-text {
     font-family: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 600;
+    font-weight: 800;
     line-height: 1.2em;
-    font-family: futura-pt;
-    font-weight: 500;
+    font-family: Lexend;
+    font-weight: 600;
     font-style: normal;
     letter-spacing: 0em;
     text-transform: none;
@@ -333,8 +333,8 @@ p {
     font-family: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
     line-height: 1.2em;
-    font-family: futura-pt;
-    font-weight: 500;
+    font-family: Lexend;
+    font-weight: 800;
     font-style: normal;
     letter-spacing: 0em;
     text-transform: none;
@@ -678,6 +678,10 @@ img[data-src]:not([src]):not([srcset]) {
     flex-direction: column;
     min-height: 100vh;
 }
+footer {
+    height: 60px;
+}
+
 #footer-sections {
     margin-top: auto;
     position: relative;
