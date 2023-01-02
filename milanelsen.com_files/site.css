@@ -337,12 +337,12 @@
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/lexend/lexend-VariableFont_wght.ttf) format('truetype');
+  src: url(https://milanelsen.com/milanelsen.com_files/fonts/poppins/Poppins-Black.ttf) format('truetype');
 }
 
 @font-face {
   font-family: Lexend;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/lexend/lexend-VariableFont_wght.ttf) format("truetype");
+  src: url(https://milanelsen.com/milanelsen.com_files/fonts/lexend/lexend-variable.ttf) format("truetype");
 }
 
 
