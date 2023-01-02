@@ -295,54 +295,54 @@
   font-family: 'Poppins';
   font-style: italic;
   font-weight: 300;
-  src: url(https://fonts.gstatic.com/s/poppins/v20/pxiDyp8kv8JHgFVrJJLm21lVFteOYktMqlap.woff2) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-lightitalic.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: italic;
   font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/poppins/v20/pxiGyp8kv8JHgFVrJJLucXtAOvWDSHFF.woff2) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-italic.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: italic;
   font-weight: 700;
-  src: url(https://fonts.gstatic.com/s/poppins/v20/pxiDyp8kv8JHgFVrJJLmy15VFteOYktMqlap.woff2) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-blackitalic.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 300;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/poppins/poppins-medium.ttf) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-light.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/poppins/poppins-medium.ttf) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-regular.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 500;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/poppins/poppins-medium.ttf) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-medium.ttf) format('truetype');
 }
 
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/poppins/poppins-black.ttf) format('truetype');
+  src: url(../milanelsen.com_files/fonts/poppins/poppins-black.ttf) format('truetype');
 }
 
 @font-face {
   font-family: Lexend;
-  src: url(https://milanelsen.com/milanelsen.com_files/fonts/lexend/lexend-variable.ttf) format("truetype");
+  src: url(../milanelsen.com_files/fonts/lexend/lexend-variable.ttf) format("truetype");
 }
 
 
