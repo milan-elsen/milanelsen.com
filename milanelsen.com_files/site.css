@@ -342,7 +342,7 @@
 
 @font-face {
   font-family: Lexend;
-  src: url(../milanelsen.com_files/fonts/lexend/lexend-variable.ttf) format("truetype");
+  src: url(../../milanelsen.com_files/fonts/lexend/lexend-variable.ttf) format("truetype");
 }
 
 
@@ -616,7 +616,7 @@ h1, h3, h4 {
     font-style: normal;
     letter-spacing: 0em;
     text-transform: none;
-    line-height: 1.4em;
+    line-height: 1.2em;
     font-size: 2rem;
 }
 h1 {
