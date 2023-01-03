@@ -309,7 +309,7 @@
   font-family: 'Poppins';
   font-style: italic;
   font-weight: 700;
-  src: url(https://milanelsen.com/fonts/poppins/poppins-blackitalic.ttf) format('truetype');
+  src: url(https://milanelsen.com/fonts/poppins/poppins-bolditalic.ttf) format('truetype');
 }
 
 @font-face {
@@ -337,7 +337,7 @@
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
-  src: url(https://milanelsen.com/fonts/poppins/poppins-black.ttf) format('truetype');
+  src: url(https://milanelsen.com/fonts/poppins/poppins-bold.ttf) format('truetype');
 }
 
 @font-face {
