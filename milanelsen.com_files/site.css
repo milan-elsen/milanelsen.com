@@ -382,6 +382,17 @@ a:active, a:hover {
     outline: 0;
 }
 
+/*
+.button-link:hover {
+	text-decoration: none;
+    border: none;
+    border-radius: 6pt;
+    background: rgba(0,0,0,.1);
+    box-shadow: 0 0 0 3px rgba(0,0,0,.1);
+    outline: none;
+}
+*/
+
 h1 {
     font-size: 2em;
     margin: .67em 0;
