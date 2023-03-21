@@ -139,6 +139,7 @@
 --shape-block-background-color:hsla(var(--lightAccent-hsl),1);
 --shape-block-dropshadow-color:hsla(var(--lightAccent-hsl),1);
 --siteBackgroundColor:hsla(var(--white-hsl),1);
+--appSectionBackground:hsla(0, 0%, 96%);
 --siteTitleColor:hsla(var(--black-hsl),1);
 --social-links-block-main-icon-color:hsla(var(--black-hsl),1);
 --social-links-block-secondary-icon-color:hsla(var(--white-hsl),1);
@@ -1043,6 +1044,7 @@ img[data-src]:not([src]):not([srcset]) {
     bottom: 0;
     left: 0;
 }
+
 .section-background {
     overflow: hidden;
     pointer-events: none;
