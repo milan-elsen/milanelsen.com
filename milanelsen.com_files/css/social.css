@@ -21,10 +21,10 @@
     fill: url(#insta-gradient) #962FBF;
 }
 
-.social-snap:hover {
+.social-linkedin:hover {
     transition: fill .2s ease-in-out;
     
-    fill:#e9d110
+    fill:#007ebb
 }
 
 .social-github-milan-elsen:hover {
