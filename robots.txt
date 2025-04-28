@@ -1,0 +1,2 @@
+User-agent: Googlebot-Image
+Disallow: /milanelsen.com_files/img/imprint_address.png
