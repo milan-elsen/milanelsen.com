@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Advent Calendar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* use Helvetica as requested */
+    html, body {
+      height: 100%;
+      overscroll-behavior: none; /* prevent system rubberbanding */
+    }
+
+    body {
+      font-family: Helvetica, "Helvetica Neue", Arial, system-ui, -apple-system;
+      background: #ffffff;
+      color: #111;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* spacer sets page height so vertical scroll maps to horizontal scroll */
+    .spacer { width: 1px; height: 100vh; }
+
+    /* fixed viewport — page scroll drives horizontal scroll inside */
+    .viewport {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      height: 100vh;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .cybergoth-ascii {
+      /* enforce a true monospace stack and disable ligatures so characters align vertically */
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+      white-space: pre;
+      text-align: center;
+      line-height: 1;
+      margin: 8px 0 6px;
+      color: #0a0a0a;
+      opacity: 0.95;
+      font-size: 12px;
+      letter-spacing: 0; /* equal spacing per glyph */
+      font-variant-ligatures: none;
+      -webkit-font-feature-settings: "liga" 0;
+      font-feature-settings: "liga" 0;
+      hyphens: none;
+    }
+
+    h1.cybergoth {
+      text-align: center;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #111;
+    }
+
+    .warning {
+      display: none;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      padding: 10px 12px;
+      font-size: 13px;
+      text-align: center;
+      margin: 12px;
+    }
+
+    /* horizontal scroll wrapper — top padding so grid sits in the bottom ~2/3 of the viewport */
+    .scroll-wrap {
+      /* top pad ~1/3 viewport so the grid occupies the bottom ~2/3 */
+      --top-pad: 33.333vh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: stretch;
+      /* remove horizontal padding so content is flush left/right; keep top and small bottom safe area */
+      padding: var(--top-pad) 0 calc(env(safe-area-inset-bottom, 12px) + 6px);
+      pointer-events: auto;
+
+      /* hide native scrollbars */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .scroll-wrap::-webkit-scrollbar { height: 0; width: 0; display: none; }
+
+    /* ensure no visible scrollbars anywhere (overlay scrollbars, browsers) */
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+
+    /* three rows, column flow; grid-auto-columns controlled by JS via --cell-size */
+    .calendar {
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-rows: repeat(3, var(--cell-size, 120px));
+      grid-auto-columns: var(--cell-size, 120px);
+      gap: 10px;
+      align-items: stretch;
+      width: max-content;
+      /* explicitly size the grid to occupy the bottom two-thirds of the viewport */
+      height: calc(66.666vh - (env(safe-area-inset-bottom, 12px) + 6px));
+    }
+
+    /* square tiles using computed cell size */
+    .door {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: #000;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms;
+      user-select: none;
+      text-align: center;
+      width: var(--cell-size, 120px);
+      height: var(--cell-size, 120px);
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    .door:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); }
+    .door:focus { outline: 3px solid rgba(0,0,0,0.08); outline-offset: 2px; }
+
+    /* larger square breakers: span 2x2 */
+    .span-2x2 { grid-column: span 2; grid-row: span 2; width: calc(var(--cell-size,120px) * 2 + 10px); height: calc(var(--cell-size,120px) * 2 + 10px); }
+
+    /* allow some tiles to span 1x2 or 2x1 if desired (keeps rectangular breakouts) */
+    .span-row-2 { grid-row: span 2; height: calc(var(--cell-size,120px) * 2 + 10px); }
+    .span-col-2 { grid-column: span 2; width: calc(var(--cell-size,120px) * 2 + 10px); }
+
+    .door:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; pointer-events: none; }
+
+    .door.opened { color: #fff; border-color: #000; background: #000; transform: none; opacity: 1; }
+
+    .calendar:focus { outline: none; }
+
+    /* --- modal styles for content behind doors --- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    .modal {
+      background: #fff;
+      color: #111;
+      max-width: 92vw;
+      max-height: 86vh;
+      width: 420px;
+      border: 2px solid #000;
+      box-sizing: border-box;
+      padding: 14px;
+      overflow: auto;
+      position: relative;
+    }
+    .modal .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .modal .modal-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .modal .modal-body img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    .modal .modal-body a {
+      color: #0066cc;
+      word-break: break-word;
+    }
+    .modal .modal-body p {
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="spacer" id="spacer"></div>
+
+  <div class="viewport" id="viewport">
+    <div class="container">
+      <div id="warning" class="warning" role="status" aria-live="polite">
+        For the intended experience open this on a phone.
+      </div>
+
+      <pre class="cybergoth-ascii" aria-hidden="true">⛧☾༺♰༻☽⛧</pre>
+      <h1 id="title" class="cybergoth">🎀 D ྀིྀིᨵׁׅ𝕣ɑׁׅ֮꯱ׁׅ֒ Aժׁׅ݊᥎꫶ׁׅꫀׁׅܻꪀׁׅtׁׅ꯱ׁׅ֒ƙׁׅ֑ɑׁׅ֮ᥣׁׅ֪ꫀׁׅܻꪀׁׅժׁׅ݊ꫀׁׅܻ𝕣</h1>
+      <pre class="cybergoth-ascii" aria-hidden="true">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡴⣆⠀⠀⠀⠀⠀⣠⡀⠀⠀⠀⠀⠀⠀⣼⣿⡗⠀⠀⠀⠀
+⠀⠀⠀⣠⠟⠀⠘⠷⠶⠶⠶⠾⠉⢳⡄⠀⠀⠀⠀⠀⣧⣿⠀⠀⠀⠀⠀
+⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣤⣤⣤⣤⣤⣿⢿⣄⠀⠀⠀⠀
+⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⠀⠀⠀⠀⠙⣷⡴⠶⣦
+⠀⠀⢱⡀⠀⠉⠉⠀⠀⠀⠀⠛⠃⠀⢠⡟⠀⠀⠀⢀⣀⣠⣤⠿⠞⠛⠋
+⣠⠾⠋⠙⣶⣤⣤⣤⣤⣤⣀⣠⣤⣾⣿⠴⠶⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀
+⠛⠒⠛⠉⠉⠀⠀⠀⣴⠟⢃⡴⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+</pre>
+
+      <div class="scroll-wrap" id="scrollWrap" aria-hidden="false">
+        <div class="calendar" id="calendar" aria-label="Advent calendar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal markup for door contents -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const calendar = document.getElementById('calendar');
+      const warning = document.getElementById('warning');
+      const scrollWrap = document.getElementById('scrollWrap');
+      const spacer = document.getElementById('spacer');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      const modalClose = document.getElementById('modalClose');
+
+      function isPhoneDevice() {
+        const ua = navigator.userAgent || '';
+        const mobileRe = /Mobi|Android.*Mobile|iPhone|iPod|Windows Phone|BlackBerry/i;
+        if (mobileRe.test(ua)) return true;
+        if (navigator.userAgentData && navigator.userAgentData.mobile) return true;
+        return !!(navigator.maxTouchPoints && window.innerWidth <= 820);
+      }
+
+      if (!isPhoneDevice()) {
+        warning.style.display = 'block';
+        scrollWrap.style.display = 'none';
+        return;
+      } else {
+        warning.style.display = 'none';
+      }
+
+      const now = new Date();
+      const today = Math.max(1, Math.min(now.getDate(), 24));
+
+      // CONTENTS: put your content here. Key = day number (1..24).
+      // type: 'text' | 'image' | 'gif' | 'link' | 'html'
+      // value: string (text, URL, or markup)
+      // title: optional title shown in modal
+      const CONTENTS = {
+        1: { type: 'text', title: 'Welcome', value: "Happy December! Click around." },
+        2: { type: 'image', title: 'Cute Picture', value: 'https://placekitten.com/400/400' },
+        3: { type: 'gif', title: 'Funny GIF', value: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif' },
+        4: { type: 'link', title: 'Special Link', value: 'https://example.com' },
+        5: { type: 'html', title: 'Custom HTML', value: '<strong>HTML content</strong><p>Put any safe markup here.</p>' },
+        // fill others as needed; fallback handled below
+      };
+
+      // persistent random but static order (saved to localStorage)
+      const ORDER_KEY = 'advent-calendar-order-v6';
+      const OPENED_KEY = 'advent-calendar-opened-v1';
+      let stored = null;
+      try { stored = JSON.parse(localStorage.getItem(ORDER_KEY)); } catch (e) { stored = null; }
+
+      // load previously opened days (array of day numbers)
+      let storedOpened = null;
+      try { storedOpened = JSON.parse(localStorage.getItem(OPENED_KEY)); } catch (e) { storedOpened = null; }
+      const openedSet = new Set(Array.isArray(storedOpened) ? storedOpened : []);
+
+      let days;
+      if (stored && Array.isArray(stored) && stored.length === 24) {
+        days = stored;
+      } else {
+        days = Array.from({ length: 24 }, (_, i) => i + 1);
+        for (let i = days.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [days[i], days[j]] = [days[j], days[i]];
+        }
+        try { localStorage.setItem(ORDER_KEY, JSON.stringify(days)); } catch (e) { /* ignore */ }
+      }
+
+      // spans: restore previous spans if earlier code saved them, otherwise generate same behavior as before
+      const SPANS_KEY = 'advent-calendar-spans-v1';
+      let spans = null;
+      try { spans = JSON.parse(localStorage.getItem(SPANS_KEY)); } catch (e) { spans = null; }
+      if (!Array.isArray(spans) || spans.length !== 24) {
+        spans = Array(24).fill(false);
+        function setLarge(day) { const idx = days.indexOf(day); if (idx >= 0) spans[idx] = true; }
+        setLarge(6); setLarge(24);
+        const candidates = days.filter(d => d !== 6 && d !== 24);
+        for (let k = 0; k < 3 && candidates.length; k++) {
+          const i = Math.floor(Math.random() * candidates.length);
+          const pick = candidates.splice(i,1)[0];
+          setLarge(pick);
+        }
+        try { localStorage.setItem(SPANS_KEY, JSON.stringify(spans)); } catch(e){}
+      }
+
+      // helper to render content inside modal
+      function renderContent(obj) {
+        modalBody.innerHTML = '';
+        if (!obj) {
+          const p = document.createElement('p');
+          p.textContent = 'No content for this door.';
+          modalBody.appendChild(p);
+          return;
+        }
+        const t = (obj.type || 'text').toLowerCase();
+        if (t === 'text') {
+          const p = document.createElement('p');
+          p.textContent = obj.value;
+          modalBody.appendChild(p);
+        } else if (t === 'image' || t === 'gif') {
+          // make the image clickable and open the source in a new tab
+          const a = document.createElement('a');
+          a.href = obj.value;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          const img = document.createElement('img');
+          img.src = obj.value;
+          img.alt = obj.title || 'Image';
+          img.style.cursor = 'zoom-in';
+          a.appendChild(img);
+          modalBody.appendChild(a);
+        } else if (t === 'link') {
+          const a = document.createElement('a');
+          a.href = obj.value;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = obj.value;
+          modalBody.appendChild(a);
+        } else if (t === 'html') {
+          // insert as markup — keep simple. Avoid unsafe content if user-provided.
+          modalBody.innerHTML = obj.value;
+        } else {
+          const p = document.createElement('p');
+          p.textContent = obj.value || 'Content';
+          modalBody.appendChild(p);
+        }
+      }
+
+      function openModalFor(day) {
+        const obj = CONTENTS[day] || { type: 'text', title: `Day ${day}`, value: `Content for day ${day}` };
+        modalTitle.textContent = obj.title || `Day ${day}`;
+        renderContent(obj);
+        modalBackdrop.style.display = 'flex';
+        modalBackdrop.setAttribute('aria-hidden', 'false');
+        modalClose.focus();
+      }
+
+      function closeModal() {
+        modalBackdrop.style.display = 'none';
+        modalBackdrop.setAttribute('aria-hidden', 'true');
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modalBackdrop.addEventListener('click', (ev) => {
+        if (ev.target === modalBackdrop) closeModal();
+      });
+      window.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape') closeModal();
+      });
+
+      // Build grid tiles and attach modal-opening handlers
+      calendar.innerHTML = '';
+      days.forEach((d, idx) => {
+        const door = document.createElement('button');
+        door.type = 'button';
+        door.className = 'door';
+        door.textContent = d;
+        door.setAttribute('aria-label', `Open day ${d}`);
+
+        if (spans[idx]) door.classList.add('span-2x2');
+
+        if (d > today) {
+          door.disabled = true;
+          door.setAttribute('aria-disabled', 'true');
+        } else {
+          if (openedSet.has(d)) door.classList.add('opened');
+
+          door.addEventListener('click', function () {
+            // open modal with content (rather than alert)
+            openModalFor(d);
+
+            // record as opened when user views content
+            if (!openedSet.has(d)) {
+              openedSet.add(d);
+              door.classList.add('opened');
+              try { localStorage.setItem(OPENED_KEY, JSON.stringify(Array.from(openedSet))); } catch(e){}
+            }
+          });
+        }
+
+        calendar.appendChild(door);
+      });
+
+      // compute --cell-size so tiles are square and fill vertical space exactly
+      const ROWS = 3;
+      const GAP_PX = 10;
+      function updateCellSize() {
+        const calH = calendar.clientHeight;
+        if (!calH) return;
+        const totalGaps = (ROWS - 1) * GAP_PX;
+        const size = Math.floor((calH - totalGaps) / ROWS);
+        document.documentElement.style.setProperty('--cell-size', size + 'px');
+        updateSpacer();
+      }
+
+      function updateSpacer() {
+        const maxScrollLeft = Math.max(0, scrollWrap.scrollWidth - scrollWrap.clientWidth);
+        const needed = maxScrollLeft + window.innerHeight;
+        spacer.style.height = Math.ceil(needed) + 'px';
+      }
+
+      function onScroll() {
+        const maxY = Math.max(0, spacer.offsetHeight - window.innerHeight);
+        const y = Math.max(0, Math.min(window.scrollY, maxY));
+        const frac = maxY === 0 ? 0 : (y / maxY);
+        const maxScrollLeft = Math.max(0, scrollWrap.scrollWidth - scrollWrap.clientWidth);
+        scrollWrap.scrollLeft = Math.round(maxScrollLeft * frac);
+      }
+
+      // initial sizing and sync
+      function initialSetup() {
+        requestAnimationFrame(() => {
+          updateCellSize();
+          window.scrollTo(0,0);
+          onScroll();
+        });
+      }
+      initialSetup();
+
+      const ro = new ResizeObserver(() => { updateCellSize(); onScroll(); });
+      ro.observe(scrollWrap);
+      ro.observe(calendar);
+      window.addEventListener('resize', updateCellSize);
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // wheel over viewport -> move page scroll (maps to horizontal)
+      window.addEventListener('wheel', (ev) => {
+        if (scrollWrap.scrollWidth <= scrollWrap.clientWidth) return;
+        if (Math.abs(ev.deltaY) > Math.abs(ev.deltaX)) {
+          window.scrollBy({ top: ev.deltaY, behavior: 'auto' });
+          ev.preventDefault();
+        }
+      }, { passive: false });
+
+    })();
+  </script>
+</body>
+</html>
