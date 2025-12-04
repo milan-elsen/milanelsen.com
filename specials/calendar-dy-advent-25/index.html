@@ -25,6 +25,15 @@
     .spacer { width: 1px; height: 100vh; }
 
     /* fixed viewport — page scroll drives horizontal scroll inside */
+
+    .modal .modal-body {
+      /* prevent breaking/wrapping — prefer shrinking the font to fit horizontally */
+      white-space: pre; /* preserve whitespace and prevent wrapping */
+      overflow-wrap: normal;
+      word-break: normal;
+      overflow: hidden; /* we'll shrink text to fit; hide overflow rather than wrap */
+      max-height: calc(86vh - 100px);
+    }
     .viewport {
       position: fixed;
       inset: 0;
@@ -38,10 +47,45 @@
       width: 100%;
       height: 100vh;
       max-width: 420px;
+      display: grid;
+      grid-template-rows: 1fr 2fr; /* top 1/3, bottom 2/3 */
+      align-items: start;
+      pointer-events: auto;
+      padding: calc(env(safe-area-inset-top, 12px) + 8px) 12px calc(env(safe-area-inset-bottom, 12px) + 12px);
+      box-sizing: border-box;
+    }
+
+    .hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      pointer-events: auto;
+      justify-content: center;
+      text-align: center;
+      padding: 6px 0 6px;
+    }
+
+    /* ornaments sized to match the title */
+    .cybergoth-ornament {
+      font-family: inherit;
+      font-size: 18px; /* match h1.cybergoth */
+      line-height: 1;
+      margin: 6px 0;
+      color: inherit;
+      white-space: pre;
+      text-align: center;
+    }
+
+    /* smaller monospaced ornament lines (typewriter style) */
+    .cybergoth-ornament-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1;
+      margin: 4px 0;
+      color: inherit;
+      white-space: pre;
+      text-align: center;
+      letter-spacing: 0.2px;
+      opacity: 0.95;
     }
 
     .cybergoth-ascii {
@@ -84,19 +128,17 @@
 
     /* horizontal scroll wrapper — top padding so grid sits in the bottom ~2/3 of the viewport */
     .scroll-wrap {
-      /* top pad ~1/3 viewport so the grid occupies the bottom ~2/3 */
-      --top-pad: 33.333vh;
       overflow-x: auto;
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       touch-action: pan-y;
-      flex: 1;
       width: 100%;
       display: flex;
       align-items: stretch;
-      /* remove horizontal padding so content is flush left/right; keep top and small bottom safe area */
-      padding: var(--top-pad) 0 calc(env(safe-area-inset-bottom, 12px) + 6px);
+      /* top padding removed — layout now driven by the parent grid.
+         Keep a small bottom padding to avoid on-screen bars. */
+      padding: 12px 0 calc(env(safe-area-inset-bottom, 12px) + 12px);
       pointer-events: auto;
 
       /* hide native scrollbars */
@@ -112,14 +154,18 @@
     /* three rows, column flow; grid-auto-columns controlled by JS via --cell-size */
     .calendar {
       display: grid;
-      grid-auto-flow: column;
+      /* use dense packing to backfill gaps created by spanning tiles */
+      grid-auto-flow: column dense;
       grid-template-rows: repeat(3, var(--cell-size, 120px));
       grid-auto-columns: var(--cell-size, 120px);
       gap: 10px;
       align-items: stretch;
       width: max-content;
-      /* explicitly size the grid to occupy the bottom two-thirds of the viewport */
-      height: calc(66.666vh - (env(safe-area-inset-bottom, 12px) + 6px));
+      /* fill available area of the bottom grid row (2/3 of container) */
+      height: 100%;
+      /* place calendar toward the bottom of its grid area to reduce whitespace below */
+      align-self: end;
+      margin-bottom: 8px;
     }
 
     /* square tiles using computed cell size */
@@ -181,7 +227,8 @@
       border: 2px solid #000;
       box-sizing: border-box;
       padding: 14px;
-      overflow: auto;
+      /* prevent native scrolling; we'll shrink text to fit when needed */
+      overflow: hidden;
       position: relative;
     }
     .modal .modal-close {
@@ -219,12 +266,14 @@
 
   <div class="viewport" id="viewport">
     <div class="container">
+      <div class="hero">
       <div id="warning" class="warning" role="status" aria-live="polite">
         For the intended experience open this on a phone.
       </div>
-
-      <pre class="cybergoth-ascii" aria-hidden="true">⛧☾༺♰༻☽⛧</pre>
-      <h1 id="title" class="cybergoth">🎀 D ྀིྀིᨵׁׅ𝕣ɑׁׅ֮꯱ׁׅ֒ Aժׁׅ݊᥎꫶ׁׅꫀׁׅܻꪀׁׅtׁׅ꯱ׁׅ֒ƙׁׅ֑ɑׁׅ֮ᥣׁׅ֪ꫀׁׅܻꪀׁׅժׁׅ݊ꫀׁׅܻ𝕣</h1>
+      <pre class="cybergoth-ornament" aria-hidden="true">≽^• ˕ • ྀི≼</pre>
+      <h1 id="title" class="cybergoth">D ྀིྀིᨵׁׅ𝕣ɑׁׅ֮꯱ׁׅ֒ Aժׁׅ݊᥎꫶ׁׅꫀׁׅܻꪀׁׅtׁׅ꯱ׁׅ֒ƙׁׅ֑ɑׁׅ֮ᥣׁׅ֪ꫀׁׅܻꪀׁׅժׁׅ݊ꫀׁׅܻ𝕣</h1>
+      <pre class="cybergoth-ornament cybergoth-ornament-mono" aria-hidden="true">⋆˖⁺‧₊☽von milan☾₊‧⁺˖⋆</pre>
+      <pre class="cybergoth-ornament cybergoth-ornament-mono" aria-hidden="true">.˳·˖✶ für dora🎀 ✶˖·˳.</pre>
       <pre class="cybergoth-ascii" aria-hidden="true">
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀
 ⠀⠀⠀⠀⢀⡴⣆⠀⠀⠀⠀⠀⣠⡀⠀⠀⠀⠀⠀⠀⣼⣿⡗⠀⠀⠀⠀
@@ -237,9 +286,12 @@
 ⠀⠀⠀⠀⠀⠀⠀⠀⠛⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 </pre>
 
+      </div>
+
       <div class="scroll-wrap" id="scrollWrap" aria-hidden="false">
         <div class="calendar" id="calendar" aria-label="Advent calendar"></div>
       </div>
+      <pre class="cybergoth-ornament" aria-hidden="true">❆*━━━━ʕ•㉨•ʔ━━━━*❆</pre>
     </div>
   </div>
 
@@ -287,12 +339,13 @@
       // value: string (text, URL, or markup)
       // title: optional title shown in modal
       const CONTENTS = {
-        1: { type: 'text', title: 'Welcome', value: "Happy December! Click around." },
-        2: { type: 'image', title: 'Cute Picture', value: 'https://placekitten.com/400/400' },
-        3: { type: 'gif', title: 'Funny GIF', value: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif' },
-        4: { type: 'link', title: 'Special Link', value: 'https://example.com' },
-        5: { type: 'html', title: 'Custom HTML', value: '<strong>HTML content</strong><p>Put any safe markup here.</p>' },
-        // fill others as needed; fallback handled below
+        1: { type: 'text', title: '<i> 01.12.</i>\nWelcome', value: "Fröhlichen Advent!\nIch habe dich sooo lieb Maus.🖤" },
+        2: { type: 'gif', title: '<i> 02.12.</i>\nIch, wie ich diesen Kalender mache', value: 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif' },
+        3: { type: 'text', title: '<i> 03.12.</i>\nGuten Morgen Maus :*', value: '⣿⡿⠿⠟⠛⠛⢻⣋⣿⠋⣿⣿⣿⣿⣋⡉⠉⠙⣿⠟⣻⣿⣿⣿⣿⠏⣿⣿⣿⠛⠛⠻⠿⢿⣿⣿\n⣿⣥⣶⠀⠉⢹⡟⢻⠋⣿⡏⢡⣿⣿⣿⡇⢸⠀⣾⢩⣿⣿⠋⢠⣼⠁⠁⢹⡇⠈⢳⣤⠂⢠⣿⣿\n⣿⣿⣿⣀⣶⣿⣁⣈⣼⣟⣠⣿⣿⣿⣿⣃⣈⣠⣇⡈⢉⣅⣈⢉⣹⣀⡆⢀⣿⣶⡀⢡⣶⣾⣿⣿\n⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⡿⣿⢿⡷⣿⣿⢿⣿⣿\n⡿⢋⠉⠋⡄⢸⣿⡏⠈⠻⢿⣿⣿⡿⠿⠿⠟⠛⢿⣿⣿⢋⠀⣿⣿⠄⠈⠄⠁⢀⠄⠈⢡⡎⡈⢹\n⣇⡀⠀⠈⢰⣿⣿⠀⣷⣆⡀⠈⢁⣀⣶⣶⣶⣶⠀⠹⢁⣾⠀⣿⣷⣾⣷⡏⢿⡷⡾⡷⠎⣀⡀⣾\n⣿⣿⣿⣦⣠⣿⡇⢸⣿⣿⣿⣾⢿⣿⣿⣿⣿⣿⡷⣴⣿⣿⠀⣽⣿⣿⣿⡀⢀⣄⡤⠄⣰⣿⣿⣿\n⣿⣿⣿⡿⣿⣋⣀⠀⣀⣿⣿⣃⣼⣿⠿⠿⣿⣿⣅⣾⡿⠟⠐⠛⠛⣻⣿⣧⡀⠁⣤⣾⣿⣿⣿⣿\n⣿⠋⡄⢠⠈⣟⣉⢀⠈⣁⡠⠜⣿⣧⣤⣾⣿⣿⣿⠟⠒⠠⠶⢾⣶⣿⣿⣿⣿⠀⠟⠉⣻⣿⣿⣿\n⣿⠀⠛⠟⣠⣿⡿⠿⠀⠀⣠⣤⣿⣿⣿⣿⣿⣿⡿⠛⠠⣄⣀⣠⣿⣿⣿⣿⣿⠀⠘⢀⣿⣿⣿⣿\n⣿⣿⣦⣠⣿⣿⣶⣶⣶⣄⡈⠙⣿⣿⣿⣿⡿⢋⣀⣴⣤⣤⣄⣀⣿⣿⣿⣿⣿⠀⣾⣿⣿⣿⣿⣿' },
+        4: { type: 'link', title: '<i> 04.12.</i>\nHier eine sehnsüchtige Playlist nach dir:', value: 'https://open.spotify.com/playlist/7JguPsmzxi988gHujHDPuw?si=4tKqjlWjQL2wXjZ2gVigoQ&pi=wLSMPzgUS92M9' },
+        5: { type: 'image', title: '<i> 05.12.</i>\n♡ Danke für die ganzen wunderschönen Erinnerungen ♡', value: '../images/halloween.jpeg' },
+        23: { type: 'html', title: 'Custom HTML', value: '<strong>HTML content</strong><p>Put any safe markup here.</p>' },
+        24: { type: 'image', title: 'Funny GIF', value: '' },
       };
 
       // persistent random but static order (saved to localStorage)
@@ -322,16 +375,60 @@
       const SPANS_KEY = 'advent-calendar-spans-v1';
       let spans = null;
       try { spans = JSON.parse(localStorage.getItem(SPANS_KEY)); } catch (e) { spans = null; }
-      if (!Array.isArray(spans) || spans.length !== 24) {
-        spans = Array(24).fill(false);
-        function setLarge(day) { const idx = days.indexOf(day); if (idx >= 0) spans[idx] = true; }
-        setLarge(6); setLarge(24);
+      // We enforce: only days 6 and 24 are '2x2'. Other special tiles may be
+      // 'row-2' (1x2), 'col-2' (2x1), or null (1x1). We sanitize any stored
+      // spans and regenerate if missing/invalid.
+      const DESIRED_PAIRS = 5; // number of additional 2x1/1x2 tiles
+      function buildDefaultSpans() {
+        const s = Array(24).fill(null);
+        function setSpan(day, type) { const idx = days.indexOf(day); if (idx >= 0) s[idx] = type; }
+        setSpan(6, '2x2');
+        setSpan(24, '2x2');
         const candidates = days.filter(d => d !== 6 && d !== 24);
-        for (let k = 0; k < 3 && candidates.length; k++) {
+        for (let k = 0; k < DESIRED_PAIRS && candidates.length; k++) {
           const i = Math.floor(Math.random() * candidates.length);
           const pick = candidates.splice(i,1)[0];
-          setLarge(pick);
+          const t = Math.random() < 0.5 ? 'row-2' : 'col-2';
+          setSpan(pick, t);
         }
+        return s;
+      }
+
+      if (!Array.isArray(spans) || spans.length !== 24) {
+        spans = buildDefaultSpans();
+        try { localStorage.setItem(SPANS_KEY, JSON.stringify(spans)); } catch(e){}
+      } else {
+        // sanitize stored spans: convert legacy booleans to '2x2', normalize values
+        spans = spans.map(v => {
+          if (v === true) return '2x2';
+          if (v === false || v == null) return null;
+          if (typeof v === 'string') {
+            const ok = ['2x2','row-2','col-2'];
+            return ok.includes(v) ? v : null;
+          }
+          return null;
+        });
+
+        // ensure only 6 and 24 are '2x2' (clear any other 2x2s)
+        spans = spans.map((v, i) => {
+          // map i -> day number via days array
+          const day = days[i];
+          if (v === '2x2' && day !== 6 && day !== 24) return null;
+          return v;
+        });
+
+        // count existing row/col spans and add more if needed
+        const existingPairs = spans.filter(v => v === 'row-2' || v === 'col-2').length;
+        if (existingPairs < DESIRED_PAIRS) {
+          const need = DESIRED_PAIRS - existingPairs;
+          const candidates = days.map((d, idx) => ({d, idx})).filter(o => o.d !== 6 && o.d !== 24 && spans[o.idx] == null);
+          for (let k = 0; k < need && candidates.length; k++) {
+            const i = Math.floor(Math.random() * candidates.length);
+            const pick = candidates.splice(i,1)[0];
+            spans[pick.idx] = Math.random() < 0.5 ? 'row-2' : 'col-2';
+          }
+        }
+
         try { localStorage.setItem(SPANS_KEY, JSON.stringify(spans)); } catch(e){}
       }
 
@@ -366,7 +463,13 @@
           a.href = obj.value;
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
-          a.textContent = obj.value;
+          // extract domain from URL
+          try {
+            const url = new URL(obj.value);
+            a.textContent = url.hostname;
+          } catch (e) {
+            a.textContent = obj.value;
+          }
           modalBody.appendChild(a);
         } else if (t === 'html') {
           // insert as markup — keep simple. Avoid unsafe content if user-provided.
@@ -378,18 +481,94 @@
         }
       }
 
-      function openModalFor(day) {
+function openModalFor(day) {
         const obj = CONTENTS[day] || { type: 'text', title: `Day ${day}`, value: `Content for day ${day}` };
-        modalTitle.textContent = obj.title || `Day ${day}`;
+        const title = obj.title || `Day ${day}`;
+        // convert \n to <br> for proper line breaks in title
+        modalTitle.innerHTML = title.replace(/\n/g, '<br>');
         renderContent(obj);
         modalBackdrop.style.display = 'flex';
         modalBackdrop.setAttribute('aria-hidden', 'false');
-        modalClose.focus();
+
+        // attempt to shrink text so it fits the modal without scrolling
+        // we run after showing so measurements are accurate
+        (function fitModalContent() {
+          const modalEl = modalBackdrop.querySelector('.modal');
+          const bodyEl = modalBody;
+          if (!modalEl || !bodyEl) {
+            modalClose.focus();
+            return;
+          }
+
+          // reset any previous sizing
+          bodyEl.style.fontSize = '';
+
+          function contentOverflows() {
+            // allow a tiny tolerance (4px)
+            const overV = bodyEl.scrollHeight > (modalEl.clientHeight - 4);
+            const overH = bodyEl.scrollWidth > (modalEl.clientWidth - 4);
+            return overV || overH;
+          }
+
+          function shrinkUntilFits() {
+            const style = window.getComputedStyle(bodyEl);
+            // start from computed size (may be '12px' etc.)
+            let current = parseFloat(style.fontSize) || 16;
+            const min = 10; // don't shrink smaller than 10px
+            let iterations = 0;
+            while (contentOverflows() && current > min && iterations < 25) {
+              current = Math.max(min, current - 1);
+              bodyEl.style.fontSize = current + 'px';
+              iterations++;
+            }
+            // if still overflows, try a small overall scale as a last resort
+            if (contentOverflows()) {
+              let scale = 0.98;
+              let tries = 0;
+              bodyEl.style.transformOrigin = 'top center';
+              while (contentOverflows() && tries < 8) {
+                bodyEl.style.transform = `scale(${scale})`;
+                scale -= 0.02;
+                tries++;
+              }
+            } else {
+              // ensure transform is cleared if we fit with font-size
+              bodyEl.style.transform = '';
+            }
+          }
+
+          // If images exist, wait for them to load before final shrinking
+          const imgs = Array.from(bodyEl.querySelectorAll('img'));
+          if (imgs.length === 0) {
+            shrinkUntilFits();
+            modalClose.focus();
+            return;
+          }
+
+          let pending = imgs.length;
+          const onLoaded = () => {
+            pending--;
+            if (pending <= 0) {
+              shrinkUntilFits();
+              modalClose.focus();
+            }
+          };
+          imgs.forEach(img => {
+            if (img.complete) onLoaded();
+            else img.addEventListener('load', onLoaded, { once: true });
+            img.addEventListener('error', onLoaded, { once: true });
+          });
+          // fallback: if images don't fire quickly, run shrink after 250ms
+          setTimeout(() => { if (pending > 0) { shrinkUntilFits(); modalClose.focus(); } }, 250);
+        })();
       }
 
       function closeModal() {
         modalBackdrop.style.display = 'none';
         modalBackdrop.setAttribute('aria-hidden', 'true');
+        // clear any font-size/transform adjustments we made when opening
+        modalBody.style.fontSize = '';
+        modalBody.style.transform = '';
       }
 
       modalClose.addEventListener('click', closeModal);
@@ -409,7 +588,10 @@
         door.textContent = d;
         door.setAttribute('aria-label', `Open day ${d}`);
 
-        if (spans[idx]) door.classList.add('span-2x2');
+        const spanType = spans[idx];
+        if (spanType === '2x2') door.classList.add('span-2x2');
+        else if (spanType === 'row-2') door.classList.add('span-row-2');
+        else if (spanType === 'col-2') door.classList.add('span-col-2');
 
         if (d > today) {
           door.disabled = true;
@@ -447,7 +629,8 @@
 
       function updateSpacer() {
         const maxScrollLeft = Math.max(0, scrollWrap.scrollWidth - scrollWrap.clientWidth);
-        const needed = maxScrollLeft + window.innerHeight;
+        const vh = document.documentElement.clientHeight || window.innerHeight;
+        const needed = maxScrollLeft + vh;
         spacer.style.height = Math.ceil(needed) + 'px';
       }
 
