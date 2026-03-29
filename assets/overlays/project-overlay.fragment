@@ -1,0 +1,83 @@
+<div class="project-overlay" data-project-overlay role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="project-overlay-title">
+  <button class="project-overlay-close" type="button" aria-label="Close project overlay" data-overlay-close>&times;</button>
+
+  <div class="project-overlay-shell">
+    <section class="project-overlay-row project-overlay-row--top" aria-label="Overlay navigation">
+      <article class="project-overlay-panel">
+        <p class="project-overlay-panel-label">Time</p>
+        <p class="project-overlay-panel-value" data-overlay-time>—</p>
+      </article>
+      <article class="project-overlay-panel">
+        <p class="project-overlay-panel-label">School Project</p>
+        <p class="project-overlay-panel-value" data-overlay-school-project>—</p>
+      </article>
+      <article class="project-overlay-panel">
+        <p class="project-overlay-panel-label">Outcome</p>
+        <p class="project-overlay-panel-value" data-overlay-result>—</p>
+      </article>
+      <article class="project-overlay-panel project-overlay-panel--close">
+        <p class="project-overlay-panel-label">Team</p>
+        <p class="project-overlay-panel-value" data-overlay-team>—</p>
+      </article>
+    </section>
+
+    <section class="project-overlay-main" aria-live="polite">
+      <div class="project-overlay-main-layout">
+        <div class="project-overlay-main-copy">
+          <h2 id="project-overlay-title" data-overlay-title>Project title</h2>
+          <p data-overlay-subtitle hidden>Project subtitle</p>
+          <p data-overlay-meta>Project discipline</p>
+          <p data-overlay-summary>Select a project card to load this overlay with project-specific content.</p>
+          <div class="project-overlay-link-row" data-overlay-links hidden></div>
+        </div>
+        <article class="project-overlay-main-gallery" aria-label="Project gallery">
+          <div class="project-overlay-gallery-frame">
+            <img class="project-overlay-gallery-image" data-overlay-gallery-image src="assets/img/gallery-placeholder-1.svg" alt="">
+            <p class="project-overlay-gallery-caption" data-overlay-gallery-caption hidden></p>
+          </div>
+          <div class="project-overlay-gallery-controls" aria-label="Gallery navigation">
+            <button class="project-overlay-gallery-nav project-overlay-gallery-nav--prev" type="button" aria-label="Previous image" data-overlay-gallery-prev>
+              <svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="project-overlay-gallery-nav project-overlay-gallery-nav--next" type="button" aria-label="Next image" data-overlay-gallery-next>
+              <svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </article>
+        <article class="project-overlay-main-placeholder" aria-label="Gallery placeholder" hidden>
+          <p>Visual documentation is being prepared and will be added here soon<span class="project-overlay-placeholder-ellipsis" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span><span class="visually-hidden">...</span></p>
+        </article>
+      </div>
+      <div class="project-overlay-four-grid" aria-label="Project details">
+        <article class="project-overlay-detail">
+          <h3>Context</h3>
+          <p data-overlay-context>Project context appears here.</p>
+        </article>
+        <article class="project-overlay-detail">
+          <h3>Approach</h3>
+          <p data-overlay-approach>Approach details appear here.</p>
+        </article>
+        <article class="project-overlay-detail">
+          <h3>Tools &amp; Technologies</h3>
+          <p data-overlay-tools>—</p>
+        </article>
+        <article class="project-overlay-detail">
+          <h3>Skills</h3>
+          <p data-overlay-skills>—</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="project-overlay-lightbox" data-overlay-lightbox hidden aria-hidden="true">
+  <div class="project-overlay-lightbox-stage">
+    <button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button>
+    <img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt="">
+    <p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p>
+  </div>
+</div>

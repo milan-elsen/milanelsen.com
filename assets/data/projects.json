@@ -1,0 +1,195 @@
+{
+  "control-performance-trust": {
+    "title": "Control, Performance & Trust",
+    "subtitle": "In Surveillance Society",
+    "meta": "Interaction Design, Intermediate Examination",
+    "summary": "Through a theory-informed practice, I developed an interactive exhibit shaped by continuous reflection on surveillance studies alongside iterative prototyping. On a theoretical level, I tested the thesis that surveillance acts as a form of preemptive control, altering notions of trust and the performance of the self in interpersonal relationships. This research materialized in a responsive live-loop installation: a mirror that not only reflects the viewer but also tracks and visualizes their presence in real time. It overlays traces of previous observers, transforming the act of looking into both self-observation and the monitoring of others: Placing participants in the role of watcher and watched simultaneously.",
+    "context": "Intermediate Examination at KISD.",
+    "approach": "Design Research.\nIterative prototyping.",
+    "outcome": "The outcome is a responsive live-loop mirror installation that reflects viewers while tracking and visualizing their presence in real time.",
+    "time": "June 2025 (8 weeks)",
+    "semester": "4",
+    "result": "Essay\nInteractive Video Installation",
+    "team": "Solo Work",
+    "tools": "TouchDesigner\nPython\nCamera tracking\nInstallation prototyping",
+    "skills": "Project Management\nPrototyping\nStorytelling",
+    "gallery": [
+      { "src": "assets/img/control/control-01.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-02.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-03.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-04.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-05.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-06.jpg", "subtitle": "" },
+      { "src": "assets/img/control/control-07.jpg", "subtitle": "" }
+    ],
+    "year": "2025",
+    "links": [
+      {
+        "label": "Full Work",
+        "href": "https://milanelsen.com/files/intermediate_elsen.pdf"
+      },
+      {
+        "label": "Demo Video",
+        "href": "https://milanelsen.com/files/intermediate_docu.mp4"
+      }
+    ],
+    "supervisingProfessor": "Fourth Semester\nSupervised by: Prof. Dr. Lasse Scherffig"
+  },
+  "quantum-abacus": {
+    "title": "Quantum Abacus",
+    "meta": "Interaction Design, Science Communication",
+    "summary": "Quantum Abacus is a kinetic installation that translates superposition and probabilistic measurement into a physical, abacus-inspired exhibit. It was developed in a competition for the Institute of AI Saftey of the German Aerospace Center (DLR) in Collaboration with Parsons School of Design in New York. The project demonstrates a novel approach to science communication by allowing visitors to interact with quantum concepts directly. Instead of explaining quantum principles through abstraction alone, the project lets visitors manipulate probabilities and directly experience in real time how a calculation can be made, with the otherwise un-imaginable quantum mechanics. The project tested the boundaries of what is possible with typical science-communication approaches, as the principles of quantum computing are utterly incompatble with metaphors in the atomic scale world. As the winners of the competition, Cora Kindermann and me were employed by the DLR.",
+    "context": "Science-communication exhibit concept translating superposition and measurement into a tangible interaction.",
+    "approach": "Science communication,\nIterative Prototyping,\nIterative User Testing",
+    "outcome": "Concept and prototype developed with partners at Parsons and DLR.",
+    "time": "November 2024 (6 weeks)",
+    "semester": "3",
+    "result": "Concept\nInteractive Exhibit Prototype",
+    "team": [
+      { "name": "Cora Kindermann", "href": "https://www.instagram.com/_coraalice_/" }
+    ],
+    "tools": "3D Printing\nArduino\nStepper motors",
+    "skills": "Physical Computing\nLaser Cutting,\n3D Printing,\nRemote Collaboration,\nInterface Design",
+    "gallery": [
+      { "src": "assets/img/quantum-abacus/abacus-01.jpg", "subtitle": "" },
+      { "src": "assets/img/quantum-abacus/abacus-02.jpg", "subtitle": "" },
+      { "src": "assets/img/quantum-abacus/abacus-03.jpg", "subtitle": "" },
+      { "src": "assets/img/quantum-abacus/abacus-04.jpg", "subtitle": "" }
+    ],
+    "year": "2024",
+    "linkHref": "https://howtoshowoffquantumcomputing.cargo.site/winner",
+    "linkLabel": "Visit project website",
+    "supervisingProfessor": "Third Semester\nSupervised by: Prof. Dr. Lasse Scherffig & Prof. Nina Juric"
+  },
+  "un-identikit": {
+    "title": "Un-Identikit",
+    "subtitle": "Clothing for Solidarity in a Post-Body World",
+    "meta": "Speculative Design, Fashion, Storytelling",
+    "summary": "Un-Identikit is a speculative fashion prototype that treats clothing as both a medium of expression and an infrastructure of protection in a post-apocalyptic, hyper-surveilled, permanent-crisis future. The project explores how garments can resist fixed identity assignment, and create collective visual codes that communicate anonymous solidarity instead.",
+    "context": "Speculative fashion project imagining collective self-protection in a post-body surveillance regime.",
+    "approach": "Critical/Speculative design,\nMaterial Storytelling,\nCultural Commentary",
+    "outcome": "Concept and prototype emphasizing solidarity through shared visual codes.",
+    "time": "May 2025 (6 weeks)",
+    "semester": "4",
+    "result": "Concept\nTextile Prototype",
+    "team": "Solo Work",
+    "tools": "Speculative design methods, fashion prototyping",
+    "skills": "Narrative Design,\nTextile Prototyping,\nCultural Analysis",
+    "gallery": [
+      { "src": "assets/img/un-identikit/un-identikit-01.jpg", "subtitle": "" },
+      { "src": "assets/img/un-identikit/un-identikit-02.jpg", "subtitle": "Data ≠ Self" },
+      { "src": "assets/img/un-identikit/un-identikit-03.jpg", "subtitle": "Post Body" },
+      { "src": "assets/img/un-identikit/un-identikit-04.jpg", "subtitle": "Solidarity" }
+    ],
+    "year": "2025",
+    "supervisingProfessor": "Fourth Semester\nSupervised by: Patricia Hepp"
+  },
+  "going-out": {
+    "title": "Going Out",
+    "subtitle": "",
+    "meta": "Speculative Design, Fashion, Storytelling",
+    "summary": "",
+    "context": "",
+    "approach": "",
+    "outcome": "",
+    "time": "",
+    "semester": "1",
+    "result": "",
+    "team": "",
+    "tools": "",
+    "skills": "",
+    "gallery": [],
+    "year": "",
+    "supervisingProfessor": ""
+  },
+  "reverse-engineered": {
+    "title": "Reverse Engineered",
+    "meta": "Product Design",
+    "summary": "Reverse Engineered is a compact product-semantics study that reworks familiar domestic objects through deliberately inverted material choices. By preserving recognizable forms while shifting expected material logic, the project tests how strongly functional meaning is tied to material cues and where interpretation begins to break, creating friction between what an object looks like and what it seems meant to do.",
+    "context": "Material-semantics study on how substance alters the perceived purpose of familiar objects.",
+    "approach": "Rebuilt domestic object archetypes with inverted material-function pairings as physical models.",
+    "outcome": "A set of physical models that question how strongly functional meaning depends on material language.",
+    "time": "July 2024 (2 weeks)",
+    "semester": "2",
+    "result": "Models",
+    "team": "Solo Work",
+    "tools": "Rapid model making,\nLaser cutting,\n3D printing,\nSilicon Molding,\nCNC",
+    "skills": "Product semantics\nForm-Language",
+    "gallery": [
+      "assets/img/reverse-engineered/reverse-engineered-01.jpg",
+      "assets/img/reverse-engineered/reverse-engineered-02.jpg",
+      "assets/img/reverse-engineered/reverse-engineered-03.jpg",
+      "assets/img/reverse-engineered/reverse-engineered-04.jpg"
+    ],
+    "year": "2024",
+    "supervisingProfessor": "Second Semester\nSupervised by: Prof. Jenz Gro\u00dfhans"
+  },
+  "happy-new-music-visuals": {
+    "title": "Happy New Music Visuals",
+    "meta": "Visual Music, Performance, Stage Design",
+    "summary": "This two-week collaboration remixes a cinematic reference into a short live performance that synchronizes image, sound, and stage dynamics. The project focuses on timing, atmosphere, and spatial rhythm, developing a responsive visual language that can support live audio performance while remaining coherent as a standalone moving-image piece.",
+    "context": "Live-performance collaboration translating a film reference into a short audio-visual set.",
+    "approach": "Built real-time image-and-sound behaviors in TouchDesigner and tuned them for stage timing.",
+    "outcome": "Live audio-visual performance with a synchronized visual system and highlight reel.",
+    "time": "Jan 2025 (2 weeks)",
+    "semester": "3",
+    "result": "Live Audio-Visual Performance",
+    "team": [
+      { "name": "Leon Amir Scheunemann", "href": "https://leonscheunemann.com" }
+    ],
+    "tools": "TouchDesigner\nPython",
+    "skills": "Stage Design\nLive Performance\nVisual Storytelling",
+    "gallery": [
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-01.jpg", "subtitle": "" },
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-02.jpg", "subtitle": "Performance Setting/Stage" },
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-03.jxl", "subtitle": "Performance Setting/Stage" },
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-04.jxl", "subtitle": "Performance Setting/Stage" },
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-05.jpg", "subtitle": "" },
+      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-06.jpg", "subtitle": "" }
+    ],
+    "year": "2025",
+    "linkHref": "portfolio/performance-highlight-reel.mp4",
+    "linkLabel": "Watch highlight reel",
+    "supervisingProfessor": "Third Semester\nSupervised by: Prof. Nina Juric"
+  },
+  "happy-birthday-widget": {
+    "title": "Happy Birthday Widget",
+    "meta": "Interface Design, iOS Development",
+    "summary": "Happy Birthday Widget is an independently developed and marketed iOS birthday-reminder app centered on customizable home-screen widgets and lightweight daily use. Beyond interface design and development, the project included product positioning, branding, a website and marketing assets. An end-to-end exercise across concept, build, and distribution.",
+    "context": "Independent product project spanning concept, build, launch, and promotion.",
+    "approach": "Privacy-First,\nHuman-centered design,\nDesign-led holistic product development",
+    "outcome": "Shipped iOS app with marketing assets, website, and campaign material.",
+    "time": "Dec 2021 - Oct 2023",
+    "semester": "Independent",
+    "result": "iOS App\nMarketing Assets\nWebsite\nSocial Ads",
+    "team": "Solo Work",
+    "tools": "Swift\nSwiftUI\nCoreData\nApp Store toolchain",
+    "skills": "End-to-end product lifecycle\nProject management\nMarketing",
+    "gallery": [
+      { "src": "assets/img/happy-birthday-widget/happy-birthday-widget.png", "subtitle": "" }
+    ],
+    "year": "2023",
+    "supervisingProfessor": ""
+  },
+  "zeichenmeister": {
+    "title": "ZeichenMeister",
+    "meta": "Interface Design",
+    "summary": "ZeichenMeister is a case study for a German sign-language learning interface that combines guided lesson flows with machine-learning-based sign detection. The project explores how onboarding, feedback, and practice structure can make sign-learning more accessible while balancing pedagogical clarity, technical feasibility, and a mobile-first interaction model.",
+    "context": "Concept study for accessible German sign-language learning through guided interaction.",
+    "approach": "Human-centered design,\nIterative User Testing,\nRapid Prototyping",
+    "outcome": "iOS app prototype and documented concept for iterative testing.",
+    "time": "Dec 2023 (6 weeks)",
+    "semester": "1",
+    "result": "iOS App Prototype",
+    "team": "Leona Balscheit",
+    "tools": "Swift\nSwiftUI\nFigma\nIllustrator",
+    "skills": "Product definition\nUser Flows\nRapid Prototyping",
+    "gallery": [
+      { "src": "assets/img/zeichenmeister/zeichenmeister.png", "subtitle": "" }
+    ],
+    "year": "2023",
+    "linkHref": "portfolio/zeichenmeister-project-doku.pdf",
+    "linkLabel": "Open project documentation",
+    "supervisingProfessor": "First Semester\nSupervised by: Richard Jungkunz"
+  }
+}
