@@ -148,8 +148,12 @@
       { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-06.jpg", "subtitle": "" }
     ],
     "year": "2025",
-    "linkHref": "portfolio/performance-highlight-reel.mp4",
-    "linkLabel": "Watch highlight reel",
+    "links": [
+      {
+        "label": "Watch highlight reel",
+        "href": "/files/performance-highlight-reel.mp4"
+      }
+    ],
     "supervisingProfessor": "Third Semester\nSupervised by: Prof. Nina Juric"
   },
   "happy-birthday-widget": {
@@ -188,8 +192,12 @@
       { "src": "assets/img/zeichenmeister/zeichenmeister.png", "subtitle": "" }
     ],
     "year": "2023",
-    "linkHref": "portfolio/zeichenmeister-project-doku.pdf",
-    "linkLabel": "Open project documentation",
+    "links": [
+      {
+        "label": "Read project documentation",
+        "href": "/files/zeichenmeister-project-doku.pdf"
+      }
+    ],
     "supervisingProfessor": "First Semester\nSupervised by: Richard Jungkunz"
   }
 }

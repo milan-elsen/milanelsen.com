@@ -210,7 +210,7 @@
     }
 
     return tags.map(function (tag) {
-      return '<span class="project-overlay-meta-pill"><span class="project-overlay-meta-marker" aria-hidden="true">⏺</span><span class="project-overlay-meta-label">' + escapeHtml(tag) + "</span></span>";
+      return '<span class="project-overlay-meta-pill"><span class="project-overlay-meta-marker" aria-hidden="true">●</span><span class="project-overlay-meta-label">' + escapeHtml(tag) + "</span></span>";
     }).join("");
   }
 
