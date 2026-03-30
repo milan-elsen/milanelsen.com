@@ -85,15 +85,7 @@
 
   <main class="site" id="content">
     <section class="intro reveal reveal-delay-1" aria-labelledby="home-title">
-      <img
-        class="intro-portrait"
-        src="assets/img/portrait-400.jpg"
-        srcset="assets/img/portrait-200.jpg 200w, assets/img/portrait-400.jpg 400w, assets/img/portrait-600.jpg 600w, assets/img/portrait.jpg 1024w"
-        sizes="(max-width: 600px) 144px, (max-width: 1024px) 218px, 250px"
-        width="1024"
-        height="1280"
-        decoding="async"
-        alt="Portrait of Milan Elsen">
+      <img class="intro-portrait" src="assets/img/portrait.jpg" width="1024" height="1280" decoding="async" alt="Portrait of Milan Elsen">
       <h1 id="home-title" class="display-title">MILAN ELSEN</h1>
       <div>
         <p class="intro-copy">As a multidisciplinary designer in Germany, I am interested in the intersection of creativity and technology, and I have a great passion for fashion, aesthetics, pop culture, and human-machine interactions. I am fascinated by how all these areas converge in design. To this end, I have a solid foundation in app development and UI/UX design, where I have gained practical experience as an independent iOS developer and interface designer.<br>Through my interest in art and philosophy, I have developed a highly conceptual and integrated design approach at the Cologne International School of Design, where I have been studying since 2023. My focus is on interaction design in the context of exhibition pieces, as well as design in the cultural and exhibition sector. Currently I am on exchange at PolyU School of Design in Hong Kong.</p>
@@ -249,64 +241,8 @@
         var gifImages = document.querySelectorAll(".project-gif[data-gif]");
         var gifState = new WeakMap();
         var gifDurationCache = {};
-        var projectGifObserver = null;
         var autoplayEnabled = false;
         var autoplayQuery = window.matchMedia ? window.matchMedia("(hover: none), (pointer: coarse)") : null;
-
-        function setGifLoadedState(img, isLoaded) {
-          if (!img) {
-            return;
-          }
-          img.setAttribute("data-gif-loaded", isLoaded ? "true" : "false");
-        }
-
-        function isGifLoaded(img) {
-          return img && img.getAttribute("data-gif-loaded") === "true";
-        }
-
-        function setGifSource(img, src) {
-          if (!img || !src) {
-            return;
-          }
-
-          if (img.getAttribute("src") !== src) {
-            img.src = src;
-          }
-          setGifLoadedState(img, true);
-        }
-
-        function loadGifStill(img) {
-          if (!img) {
-            return;
-          }
-
-          var stillSrc = img.getAttribute("data-still-src");
-          var gifSrc = img.getAttribute("data-gif");
-          setGifSource(img, stillSrc || gifSrc || "");
-        }
-
-        if ("IntersectionObserver" in window) {
-          projectGifObserver = new IntersectionObserver(function (entries, observer) {
-            entries.forEach(function (entry) {
-              if (!entry.isIntersecting) {
-                return;
-              }
-
-              var img = entry.target;
-              if (isGifLoaded(img)) {
-                observer.unobserve(img);
-                return;
-              }
-
-              loadGifStill(img);
-              observer.unobserve(img);
-            });
-          }, {
-            root: null,
-            rootMargin: "300px 0px",
-            threshold: 0.01,
-          });
-        }
 
         function clearPendingStop(img) {
           var state = gifState.get(img);
@@ -540,7 +476,7 @@
           var gifSrc = img.getAttribute("data-gif");
           var target = stillSrc || gifSrc || "";
           if (target && img.getAttribute("src") !== target) {
-            setGifSource(img, target);
+            img.src = target;
           }
         }
 
@@ -565,7 +501,7 @@
             stopAllExcept(img);
           }
           if (img.getAttribute("src") !== gifSrc) {
-            setGifSource(img, gifSrc);
+            img.src = gifSrc;
             setPlayingState(img);
           } else if (!(gifState.get(img) || {}).playStart) {
             setPlayingState(img);
@@ -597,16 +533,12 @@
 
         gifImages.forEach(function (img) {
           var gifSrc = img.getAttribute("data-gif");
+          var stillSrc = img.getAttribute("data-still-src");
           if (!gifSrc) {
             return;
           }
           gifState.set(img, { playStart: 0, stopTimer: 0 });
-          setGifLoadedState(img, false);
-          if (projectGifObserver) {
-            projectGifObserver.observe(img);
-          } else {
-            loadGifStill(img);
-          }
+          img.src = stillSrc || gifSrc;
           img.addEventListener("pointerenter", function () {
             playGif(img);
           });
