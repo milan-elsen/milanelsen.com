@@ -485,7 +485,6 @@
         var lightboxImageEl = mount.querySelector("[data-overlay-lightbox-image]");
         var lightboxCaptionEl = mount.querySelector("[data-overlay-lightbox-caption]");
         var linksEl = mount.querySelector("[data-overlay-links]");
-        var projectGifs = Array.prototype.slice.call(document.querySelectorAll(".project-gif[data-gif]"));
         var isOpen = false;
         var isLightboxOpen = false;
         var galleryItems = [];
@@ -518,48 +517,6 @@
             }
             openOverlay(parseCard(card, projectDataMap));
           });
-        }
-
-        function buildStillFromGifSource(img, callback) {
-          if (!img) {
-            callback("");
-            return;
-          }
-
-          var gifSrc = img.getAttribute("data-gif") || "";
-          if (!gifSrc) {
-            callback("");
-            return;
-          }
-
-          var probe = new Image();
-          probe.decoding = "async";
-          probe.loading = "eager";
-
-          probe.addEventListener("load", function () {
-            try {
-              var canvas = document.createElement("canvas");
-              canvas.width = probe.naturalWidth || img.naturalWidth || 1;
-              canvas.height = probe.naturalHeight || img.naturalHeight || 1;
-              var ctx = canvas.getContext("2d");
-              if (!ctx) {
-                callback("");
-                return;
-              }
-              ctx.drawImage(probe, 0, 0, canvas.width, canvas.height);
-              var still = canvas.toDataURL("image/png");
-              img.setAttribute("data-still-src", still);
-              callback(still);
-            } catch (err) {
-              callback("");
-            }
-          });
-
-          probe.addEventListener("error", function () {
-            callback("");
-          });
-
-          probe.src = gifSrc;
         }
 
         function renderGallery() {
@@ -736,54 +693,6 @@
           probe.src = src;
         }
 
-        function freezeProjectGifs() {
-          projectGifs.forEach(function (img) {
-            if (!img) {
-              return;
-            }
-            var currentSrc = img.getAttribute("src") || "";
-            if (!img.hasAttribute("data-overlay-prev-src")) {
-              img.setAttribute("data-overlay-prev-src", currentSrc);
-            }
-            var still = img.getAttribute("data-still-src");
-            if (still) {
-              img.setAttribute("src", still);
-              return;
-            }
-
-            if (img.getAttribute("data-freeze-pending") === "true") {
-              return;
-            }
-
-            img.setAttribute("data-freeze-pending", "true");
-            buildStillFromGifSource(img, function (generatedStill) {
-              img.removeAttribute("data-freeze-pending");
-              if (!generatedStill) {
-                return;
-              }
-              if (document.body.classList.contains("project-overlay-open")) {
-                img.setAttribute("src", generatedStill);
-              }
-            });
-          });
-        }
-
-        function restoreProjectGifs() {
-          projectGifs.forEach(function (img) {
-            if (!img || !img.hasAttribute("data-overlay-prev-src")) {
-              return;
-            }
-            var still = img.getAttribute("data-still-src") || "";
-            var previous = img.getAttribute("data-overlay-prev-src") || "";
-            if (still) {
-              img.setAttribute("src", still);
-            } else if (previous) {
-              img.setAttribute("src", previous);
-            }
-            img.removeAttribute("data-overlay-prev-src");
-          });
-        }
-
         function ensureClosePanelBorder() {
           if (!closePanel) {
             return null;
@@ -954,7 +863,6 @@
           requestAnimationFrame(function () {
             document.body.classList.add("project-overlay-open");
             overlay.setAttribute("aria-hidden", "false");
-            freezeProjectGifs();
             document.dispatchEvent(new CustomEvent("project-overlay:open"));
             renderClosePanelBorder();
             isOpen = true;
@@ -973,7 +881,6 @@
           overlay.classList.remove("project-overlay--scrolling");
           document.body.classList.remove("project-overlay-open");
           overlay.setAttribute("aria-hidden", "true");
-          restoreProjectGifs();
           document.dispatchEvent(new CustomEvent("project-overlay:close"));
           isOpen = false;
           window.setTimeout(function () {

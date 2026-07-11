@@ -1,0 +1,5 @@
+[
+  { "file": "frame-01.webp", "durationMs": 1500, "opaque": false },
+  { "file": "frame-02.webp", "durationMs": 300, "opaque": false },
+  { "file": "frame-03.webp", "durationMs": 300, "opaque": false }
+]
