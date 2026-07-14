@@ -25,12 +25,12 @@
 }
 
 ::selection {
-  background: #000;
+  background-color: #000;
   color: #fff;
 }
 
 ::-moz-selection {
-  background: #000;
+  background-color: #000;
   color: #fff;
 }
 
@@ -250,6 +250,11 @@ a {
 a:hover,
 a:focus-visible {
   color: var(--ink-soft);
+}
+
+.intro-copy--socials a:hover,
+.intro-copy--socials a:focus-visible {
+  text-decoration: none;
 }
 
 img,
@@ -1199,7 +1204,7 @@ body.header--menu-open {
   display: block;
   opacity: 1;
   background: transparent;
-  cursor: url("../img/cursor-dot.png") 9 9, pointer;
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='9' cy='9' r='8.5' fill='%230d5b4f'/></svg>") 9 9, pointer;
   transform: scale(1);
   transition: transform 220ms ease;
 }
