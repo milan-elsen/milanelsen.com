@@ -87,10 +87,13 @@
   <main class="site" id="content">
     <section class="intro reveal reveal-delay-1" aria-labelledby="home-title">
       <img class="intro-portrait" src="assets/img/portrait.jpg" alt="Portrait of Milan Elsen">
-      <h1 id="home-title" class="display-title">MI<span class="title-kern-fix">L</span>AN ELSEN</h1>
-      <div>
+      <div class="intro-name">
+        <h1 id="home-title" class="display-title">MI<span class="title-kern-fix">L</span>AN ELSEN</h1>
+        <p class="intro-subhead">Designer of interactive experiences</p>
+      </div>
+      <div class="intro-bio">
         <p class="intro-copy">As a multidisciplinary designer in Germany, I am interested in the intersection of creativity and technology, and I have a great passion for fashion, aesthetics, pop culture, and human-machine interactions. I am fascinated by how all these areas converge in design. To this end, I have a solid foundation in app development and UI/UX design, where I have gained practical experience as an independent iOS developer and interface designer.<br>Through my interest in art and philosophy, I have developed a highly conceptual and integrated design approach at the Cologne International School of Design, where I have been studying since 2023. My focus is on interaction design in the context of exhibition pieces, as well as design in the cultural and exhibition sector. Currently I am on exchange at PolyU School of Design in Hong Kong.</p>
-        <p class="intro-copy intro-copy--collab"><em>Open for select collaboration in interaction design and exhibition concepts.</em></p>
+        <p class="intro-copy intro-copy--collab"><em>Open for select collaboration.</em></p>
         <p class="intro-copy intro-copy--socials"><a href="socials/index.html">Socials</a></p>
         <p class="intro-copy intro-copy--small footer-notice footer-notice--left footer-notice--desktop">© 2026 milanelsen.com</p>
       </div>
@@ -505,37 +508,39 @@
         });
       }
 
-      function syncTitleWidth() {
+      function syncTextWidth(target, shouldSync) {
         var portrait = document.querySelector(".intro-portrait");
-        var title = document.getElementById("home-title");
-        if (!portrait || !title) {
+        if (!portrait || !target) {
           return;
         }
 
         function measureTextWidth() {
           var range = document.createRange();
-          range.selectNodeContents(title);
+          range.selectNodeContents(target);
           return range.getBoundingClientRect().width;
         }
 
         function apply() {
+          // Reset to the CSS-cascade font-size so each breakpoint's own base size is the starting point.
+          target.style.fontSize = "";
+          if (typeof shouldSync === "function" && !shouldSync()) {
+            return;
+          }
           var targetWidth = portrait.getBoundingClientRect().width;
           if (!targetWidth) {
             return;
           }
-          // Reset to the CSS-cascade font-size so each breakpoint's own base size is the starting point.
-          title.style.fontSize = "";
-          var baseFontSize = parseFloat(getComputedStyle(title).fontSize);
+          var baseFontSize = parseFloat(getComputedStyle(target).fontSize);
           var baseWidth = measureTextWidth();
           if (!baseFontSize || !baseWidth) {
             return;
           }
           var fontSize = baseFontSize * (targetWidth / baseWidth);
-          title.style.fontSize = fontSize + "px";
+          target.style.fontSize = fontSize + "px";
           // One correction pass for sub-pixel/hinting drift at the new size.
           var correctedWidth = measureTextWidth();
           if (correctedWidth) {
-            title.style.fontSize = (fontSize * (targetWidth / correctedWidth)) + "px";
+            target.style.fontSize = (fontSize * (targetWidth / correctedWidth)) + "px";
           }
         }
 
@@ -791,7 +796,10 @@
       setupMobileMenu();
       alignRailEmail();
       syncMediaWidths();
-      syncTitleWidth();
+      syncTextWidth(document.getElementById("home-title"));
+      syncTextWidth(document.querySelector(".intro-subhead"), function () {
+        return window.innerWidth > 600;
+      });
       window.addEventListener("load", function () {
         alignRailEmail();
         syncMediaWidths();
