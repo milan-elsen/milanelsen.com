@@ -50,7 +50,7 @@
   --display-font: "HelveticaNeue-CondensedBold", "Helvetica Neue Condensed Bold", "HelveticaNeue-Condensed", "Helvetica Neue Condensed", "Nimbus Sans Narrow", "Inter Tight", sans-serif;
   --accent-serif: "Instrument Serif", "Times New Roman", serif;
   --body-font: "Instrument Serif", "Times New Roman", serif;
-  --body-copy-size: 12pt;
+  --body-copy-size: 1.1667rem;
   --statement-font: "HelveticaNeue-CondensedBold", "Helvetica Neue Condensed Bold", "HelveticaNeue-Condensed", "Helvetica Neue Condensed", "Nimbus Sans Narrow", "Inter Tight", sans-serif;
 }
 
@@ -59,7 +59,10 @@
 }
 
 ::selection {
-  background-color: #000 !important;
+  /* Safari recomputes an opaque selection colour into a translucent "wash", which
+     turns #000 into grey. WebKit honours the colour as-is when alpha is present,
+     so a near-opaque alpha keeps it black in Safari and everywhere else. */
+  background-color: rgba(0, 0, 0, 0.995) !important;
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
 }
@@ -140,21 +143,21 @@
 .socials-page h2 {
   margin: 0.25rem 0;
   text-transform: uppercase;
-  font-size: 37pt;
+  font-size: 3.0833rem;
   line-height: 1.05;
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .socials-page h1,
   .socials-page h2 {
-    font-size: 37pt;
+    font-size: 3.0833rem;
   }
 }
 
 @media (max-width: 600px) {
   .socials-page h1,
   .socials-page h2 {
-    font-size: 21pt;
+    font-size: 1.75rem;
   }
 }
 
@@ -308,7 +311,8 @@ video {
 .nav {
   border-bottom: 0;
   padding: 0.62rem 0 0.5rem;
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .nav-inner {
@@ -336,9 +340,39 @@ video {
   color: #000;
 }
 
-.brand:hover,
+/* The wordmark keeps its colour on hover. Needs an explicit rule: the sitewide
+   a:hover outranks .brand and would tint it otherwise. */
+.brand:hover {
+  color: #000;
+}
+
+/* Keyboard users still need a visible focus state, and the colour shift is the only
+   one the wordmark has. Comes after :hover so it wins when both apply. */
 .brand:focus-visible {
   color: var(--ink);
+}
+
+/* Easter egg. The wordmark is split into three masked segments -- milan / elsen /
+   .com -- and assets/js/brand-wordmark.js picks one of several animations to play on
+   hover. All of the motion lives in the script (Web Animations API); the CSS only
+   sets up the structure it animates.
+   clip-path rather than overflow:hidden -- overflow would change an inline-block's
+   baseline and shift the wordmark. The mask is open at the top so the ascender on
+   the "l" is never cut, and closed just below the baseline so a segment moved down
+   out of it disappears; animations that rise or drop use that edge. */
+.brand-clip {
+  display: inline-block;
+  clip-path: inset(-100% -10% -0.3em -10%);
+}
+
+.brand-seg {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-clip {
+    clip-path: none;
+  }
 }
 
 @media (max-width: 600px) {
@@ -555,7 +589,7 @@ video {
 }
 
 .header-menu-nav-item--brand .header-menu-nav-item-content {
-  font-size: 20pt;
+  font-size: 1.6667rem;
   letter-spacing: 0.012em;
   text-transform: none;
 }
@@ -591,7 +625,7 @@ video {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.012em;
-  font-size: 20pt;
+  font-size: 1.6667rem;
   color: var(--ink);
 }
 
@@ -611,14 +645,14 @@ video {
 }
 
 .header-menu-nav-item--nav .header-menu-nav-item-content {
-  font-size: 32pt;
+  font-size: 2.6667rem;
 }
 
 .header-menu-nav-item--note .header-menu-nav-item-content {
   text-transform: none;
   font-weight: 400;
   font-family: var(--accent-serif);
-  font-size: 14pt;
+  font-size: 1.1667rem;
   width: calc(var(--menu-email-width) * 20 / 14);
   margin-top: 0;
 }
@@ -739,6 +773,7 @@ body.header--menu-open {
 
 .section-head p {
   margin: 0;
+  font-size: var(--body-copy-size);
   font-style: italic;
   color: var(--ink-soft);
 }
@@ -759,7 +794,9 @@ body.header--menu-open {
 }
 
 .home-page .nav-inner.site {
-  width: min(calc(100% - 2.5rem), 1400px);
+  /* Must match .home-page #content.site so the brand lines up with the
+     portrait/bio column on windows wider than ~1525px. */
+  width: min(calc(100% - 2.5rem), 1500px);
 }
 
 .socials-page .nav-inner.site {
@@ -815,7 +852,7 @@ body.header--menu-open {
 .home-page .display-title {
   font-family: var(--statement-font);
   font-weight: 700;
-  font-size: 37pt;
+  font-size: 3.0833rem;
   line-height: 0.84;
   max-width: 100%;
   text-transform: uppercase;
@@ -828,17 +865,17 @@ body.header--menu-open {
 }
 
 .home-page .intro-subhead {
-  margin: 0.35rem 0 0;
+  margin: 1.1rem 0 0;
   text-align: left;
   white-space: nowrap;
   font-family: var(--display-font);
   text-transform: uppercase;
   letter-spacing: 0.018em;
-  font-size: 10pt;
+  font-size: 0.8333rem;
   line-height: 1.15;
   font-weight: 700;
   font-style: normal;
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 
 .home-page .intro .meta-line {
@@ -852,7 +889,9 @@ body.header--menu-open {
   max-width: var(--portrait-size);
   width: var(--portrait-size);
   font-size: var(--body-copy-size);
-  text-align: left;
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
 }
 
 .home-page .intro .intro-copy--small {
@@ -892,7 +931,7 @@ body.header--menu-open {
   .home-page .footer-notice--left {
     grid-column: 1;
     text-align: left;
-    font-size: 12pt;
+    font-size: var(--body-copy-size);
   }
 
   .home-page .footer-notice--desktop {
@@ -902,7 +941,7 @@ body.header--menu-open {
 
 @media (min-width: 1025px) {
   .project-page {
-    --rail-col: 76px;
+    --rail-col: 88px;
     --rail-edge-inset: 1.2rem;
   }
 
@@ -984,7 +1023,7 @@ body.header--menu-open {
   .project-page .side-rail a:not(.side-rail-email) {
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 900;
     letter-spacing: 0.012em;
     text-transform: uppercase;
@@ -1044,7 +1083,7 @@ body.header--menu-open {
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .project-page {
-    --rail-col: 76px;
+    --rail-col: 88px;
     --rail-edge-inset: 1.2rem;
   }
 
@@ -1125,7 +1164,7 @@ body.header--menu-open {
   .project-page .side-rail a:not(.side-rail-email) {
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 900;
     letter-spacing: 0.012em;
     text-transform: uppercase;
@@ -1442,12 +1481,17 @@ body.header--menu-open {
   text-transform: none;
 }
 
+/* Names with fixed casing ("iOS") inside uppercased labels. */
+.keep-case {
+  text-transform: none;
+}
+
 .home-page .project-meta {
   grid-column: 1;
   font-family: var(--display-font);
   text-transform: uppercase;
   letter-spacing: 0.018em;
-  font-size: 10pt;
+  font-size: var(--body-copy-size);
   line-height: 1.15;
   font-style: normal;
   font-weight: 700;
@@ -1460,7 +1504,7 @@ body.header--menu-open {
   line-height: 1.32;
   margin-top: 0;
   text-align: left;
-  font-size: 12pt;
+  font-size: var(--body-copy-size);
 }
 
 .home-page .project-meta,
@@ -1488,7 +1532,7 @@ body.header--menu-open {
   .home-page {
     --left-col: min(30vw, 360px);
     --col-gap: clamp(0.7rem, 1.8vw, 1.6rem);
-    --rail-col: 76px;
+    --rail-col: 88px;
     --rail-edge-inset: 1.2rem;
   }
 
@@ -1578,7 +1622,7 @@ body.header--menu-open {
   .home-page .side-rail a:not(.side-rail-email) {
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 900;
     letter-spacing: 0.012em;
     text-transform: uppercase;
@@ -1659,13 +1703,13 @@ body.header--menu-open {
   }
 
   .home-page .intro {
-    --portrait-w: 250px;
+    --portrait-w: min(300px, calc(30vw - 3.5rem));
   }
 
   .home-page .intro-portrait {
     width: var(--portrait-size);
     margin-top: 0;
-    margin-bottom: 0.9rem;
+    margin-bottom: 1.8rem;
     order: -1;
   }
 
@@ -1986,6 +2030,11 @@ body.header--menu-open {
   vertical-align: -0.12em;
 }
 
+:is(.imprint-page, .privacy-page) .list-block p,
+:is(.imprint-page, .privacy-page) .list-block li {
+  font-size: var(--body-copy-size);
+}
+
 :is(.imprint-page, .privacy-page) .list-block p {
   margin-bottom: 1em;
 }
@@ -1998,7 +2047,7 @@ body.header--menu-open {
 
 :is(.imprint-page, .privacy-page) .list-block h3 {
   font-family: var(--statement-font);
-  font-size: 37pt;
+  font-size: 3.0833rem;
   line-height: 0.84;
 }
 
@@ -2052,7 +2101,7 @@ body.header--menu-open {
     grid-column: 1;
     justify-self: start;
     margin: 0;
-    font-size: 21pt;
+    font-size: 1.75rem;
   }
 
   :is(.imprint-page, .privacy-page) .list-block > .list-block-content {
@@ -2073,7 +2122,7 @@ body.header--menu-open {
   }
 
   :is(.imprint-page, .privacy-page) .list-block h3 {
-    font-size: 21pt;
+    font-size: 1.75rem;
     margin-bottom: var(--space-2);
   }
 }
@@ -2086,7 +2135,7 @@ body.header--menu-open {
   .home-page {
     --left-col: min(36vw, 320px);
     --col-gap: clamp(1.2rem, 3vw, 2.6rem);
-    --rail-col: 76px;
+    --rail-col: 88px;
     --rail-edge-inset: 1.2rem;
   }
 
@@ -2155,7 +2204,7 @@ body.header--menu-open {
   .home-page .side-rail a:not(.side-rail-email) {
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 900;
     letter-spacing: 0.012em;
     text-transform: uppercase;
@@ -2246,7 +2295,7 @@ body.header--menu-open {
   }
 
   .home-page .display-title {
-    font-size: 32pt;
+    font-size: 2.6667rem;
   }
 
   .home-page .display-title {
@@ -2346,7 +2395,7 @@ body.header--menu-open {
   }
 
   .home-page .display-title {
-    font-size: 21pt;
+    font-size: 1.75rem;
     margin-bottom: 0;
   }
 
@@ -2417,7 +2466,7 @@ body.header--menu-open {
   .home-page .intro-subhead {
     width: 100%;
     text-align: left;
-    font-size: 10pt;
+    font-size: 0.8333rem;
     margin-top: 3rem;
   }
 
@@ -2583,13 +2632,13 @@ body.header--menu-open {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
   gap: 0;
   width: min(100%, 1100px);
-  height: min(100%, 700px);
+  height: auto;
   max-width: 1100px;
-  max-height: 700px;
-  min-height: 0;
+  max-height: none;
+  min-height: max-content;
   transform: translateY(8px);
   transition: transform 220ms ease;
 }
@@ -2615,7 +2664,7 @@ body.header--menu-open {
 .project-overlay-main {
   margin-top: -1px;
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
 }
 
 .project-overlay-panel,
@@ -3272,19 +3321,6 @@ body.home-page.project-overlay-open > :not(.project-overlay-root) {
   .project-overlay-four-grid {
     grid-template-columns: 1fr;
     row-gap: clamp(0.35rem, 1.2vw, 0.65rem);
-  }
-}
-
-@media (max-height: 980px) {
-  .project-overlay-shell {
-    height: auto;
-    max-height: none;
-    min-height: max-content;
-    grid-template-rows: auto auto;
-  }
-
-  .project-overlay-main {
-    overflow: visible;
   }
 }
 
