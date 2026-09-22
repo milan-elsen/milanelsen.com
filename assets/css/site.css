@@ -2463,11 +2463,28 @@ body.header--menu-open {
     width: var(--portrait-size);
   }
 
+  /* On phones the subhead sits on the bio's column rather than under the name,
+     so it runs on one line -- no break after "of" -- justified to the column's
+     full width. It's the body-copy size where that fits, and shrinks with the
+     screen where it doesn't: the text is about 17em wide, and dividing the
+     column (the screen less its 0.7rem gutters) by 18 leaves room for the
+     justification to spread. The last line is justified explicitly: a
+     one-line paragraph is otherwise left alone by text-align: justify.
+     Its width matches the bio's (min(450px, 100%), centred), so on wider phones
+     it stops at the bio's edges instead of running across the whole screen. */
   .home-page .intro-subhead {
-    width: 100%;
-    text-align: left;
-    font-size: 0.8333rem;
+    width: min(450px, 100%);
+    max-width: min(450px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+    font-size: min(var(--body-copy-size), calc((100vw - 1.4rem) / 18));
+    text-align: justify;
+    text-align-last: justify;
     margin-top: 3rem;
+  }
+
+  .home-page .intro-subhead-break {
+    display: none;
   }
 
   .home-page .project-meta,
