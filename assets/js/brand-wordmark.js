@@ -401,7 +401,7 @@
   /* A word wheel, after the "blur text scroller". The wordmark blurs and fades
      out, a fan of words fades in already on the first of WORDS, steps through
      them with an arrow pointing at the current one, and lands on milanelsen.com:
-     ●, graphics, motion, interaction, technology, milanelsen.com.
+     ●, technology, interaction, experience, milanelsen.com.
      The words sit like spokes on a wheel whose hub is far off to the left, so the
      ones above tilt up and the ones below tilt down, curving back slightly; the
      further a word is from the arrow, the fainter and blurrier it gets. Each step
@@ -414,7 +414,7 @@
     // DOT is drawn rather than typed: neither font has a solid circle, and the
     // fallback fonts' versions sit at the wrong size and height.
     var DOT = "\u25cf";
-    var WORDS = [DOT, "graphics", "motion", "interaction", "technology"];
+    var WORDS = [DOT, "technology", "interaction", "experience"];
     var LEAVE_MS = 260; // the wordmark blurring and fading out
     var FAN_AT = 180; // the fan starts fading in (overlapping the end of that)
     var INTRO_MS = 340; // the fan fading in, the arrow sliding in
@@ -1490,7 +1490,7 @@
     "word-wheel": {
       run: wordWheel,
       enabled: true,
-      about: "a word wheel: \u25cf, graphics, motion, interaction, technology, and back to milanelsen.com"
+      about: "a word wheel: \u25cf, technology, interaction, experience, and back to milanelsen.com"
     },
     "fall-pop": {
       run: fallPop,

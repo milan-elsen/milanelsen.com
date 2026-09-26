@@ -31,7 +31,7 @@
     "  </div>",
     "</div>",
     '<div class="project-overlay-lightbox" data-overlay-lightbox hidden aria-hidden="true">',
-    '  <div class="project-overlay-lightbox-stage"><button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button><img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt=""><p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p></div>',
+    '  <div class="project-overlay-lightbox-stage"><button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button><img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt=""><p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p><div class="project-overlay-lightbox-controls" data-overlay-lightbox-controls aria-label="Image navigation"><button class="project-overlay-gallery-nav project-overlay-lightbox-nav project-overlay-lightbox-nav--prev" type="button" aria-label="Previous image" data-overlay-lightbox-prev><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button class="project-overlay-gallery-nav project-overlay-gallery-nav--next project-overlay-lightbox-nav project-overlay-lightbox-nav--next" type="button" aria-label="Next image" data-overlay-lightbox-next><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div></div>',
     "</div>",
   ].join("\n");
 
@@ -40,10 +40,95 @@
     return value ? value : "";
   }
 
+  /*
+   * Modern image formats (JXL for HDR stills, AVIF) only decode in some browsers, so a
+   * gallery item can carry fallbacks that are used where the primary format is unsupported.
+   * Support is probed once with a 1x1 image per format rather than inferred from load
+   * errors, so a single missing file never disables a format for the whole session.
+   */
+  var PROBE_SOURCES = {
+    jxl: "data:image/jxl;base64,/woAkAEAE4gCALQAtZ8gAAAVKqOMG7yc6/nyQ4fFtI3rDG21bWEJY7O9MEhIOGwY4s3xwRCTShIA",
+    avif: "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUEAAADrbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAETAAAAHwAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAABqaXBycAAAAEtpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGl4aQAAAAADCAgIAAAADGF2MUOBIAAAAAAAE2NvbHJuY2x4AAEAAgAGgAAAABdpcG1hAAAAAAAAAAEAAQQBAoMEAAAAJ21kYXQSAAoHOAAGkBAgaTISGsJi5OYYYYFAAACQ",
+  };
+  var formatSupport = { jxl: null, avif: null };
+  var formatProbeListeners = [];
+
+  function imageExtension(src) {
+    var match = /\.([a-z0-9]+)(?:[?#].*)?$/i.exec(String(src || ""));
+    return match ? match[1].toLowerCase() : "";
+  }
+
+  function probeImageFormats() {
+    Object.keys(PROBE_SOURCES).forEach(function (format) {
+      var probe = new Image();
+      probe.onload = function () {
+        settleFormat(format, probe.naturalWidth > 0);
+      };
+      probe.onerror = function () {
+        settleFormat(format, false);
+      };
+      probe.src = PROBE_SOURCES[format];
+    });
+  }
+
+  function settleFormat(format, supported) {
+    if (formatSupport[format] !== null) {
+      return;
+    }
+    formatSupport[format] = !!supported;
+    formatProbeListeners.forEach(function (listener) {
+      try {
+        listener();
+      } catch (error) {
+        /* a listener that throws must not block the others */
+      }
+    });
+  }
+
+  function onFormatProbe(listener) {
+    if (typeof listener === "function") {
+      formatProbeListeners.push(listener);
+    }
+  }
+
+  /* Picks the first source this browser can decode; unprobed formats count as unsupported
+     so nothing flashes a broken image, and the listener re-renders once probing settles. */
+  function pickImageSource(item) {
+    if (!item) {
+      return "";
+    }
+    var sources = Array.isArray(item.sources) && item.sources.length ? item.sources : [item.src];
+    for (var index = 0; index < sources.length; index += 1) {
+      var candidate = sources[index];
+      var support = formatSupport[imageExtension(candidate)];
+      /* undefined: a format we never probe, such as JPEG, which every browser decodes. */
+      if (support === true || support === undefined) {
+        return candidate;
+      }
+    }
+    return sources[sources.length - 1] || "";
+  }
+
+  function galleryItemSources(item, src) {
+    var declared = item.fallback || item.fallbacks || item.fallbackSrc;
+    var list = [src];
+    if (typeof declared === "string") {
+      list.push(sanitizeImageSrc(declared));
+    } else if (Array.isArray(declared)) {
+      declared.forEach(function (entry) {
+        list.push(sanitizeImageSrc(entry));
+      });
+    } else if (PROBE_SOURCES[imageExtension(src)]) {
+      /* No fallback declared: assume a sibling JPEG next to the modern original. */
+      list.push(src.replace(/\.[a-z0-9]+(?=(?:[?#]|$))/i, ".jpg"));
+    }
+    return list.filter(Boolean);
+  }
+
   function normalizeGalleryItem(item) {
     if (typeof item === "string") {
       var stringSrc = sanitizeImageSrc(item);
-      return stringSrc ? { src: stringSrc, subtitle: "" } : null;
+      return stringSrc ? { src: stringSrc, sources: galleryItemSources({}, stringSrc), subtitle: "" } : null;
     }
 
     if (item && typeof item === "object") {
@@ -55,6 +140,7 @@
       var subtitle = String(item.subtitle || item.caption || item.label || "").trim();
       return {
         src: src,
+        sources: galleryItemSources(item, src),
         subtitle: subtitle,
       };
     }
@@ -391,6 +477,8 @@
       return;
     }
 
+    probeImageFormats();
+
     function loadOverlayTemplate() {
       return fetch("assets/overlays/project-overlay.fragment", { cache: "no-store" })
         .then(function (res) {
@@ -484,6 +572,9 @@
         var lightboxCloseBtn = mount.querySelector("[data-overlay-lightbox-close]");
         var lightboxImageEl = mount.querySelector("[data-overlay-lightbox-image]");
         var lightboxCaptionEl = mount.querySelector("[data-overlay-lightbox-caption]");
+        var lightboxPrevBtn = mount.querySelector("[data-overlay-lightbox-prev]");
+        var lightboxNextBtn = mount.querySelector("[data-overlay-lightbox-next]");
+        var lightboxControlsEl = mount.querySelector("[data-overlay-lightbox-controls]");
         var linksEl = mount.querySelector("[data-overlay-links]");
         var isOpen = false;
         var isLightboxOpen = false;
@@ -519,6 +610,22 @@
           });
         }
 
+        /* Last resort: if a chosen file is missing or corrupt, step through the remaining
+           sources so a bad path degrades to the fallback instead of a broken image. */
+        function setGalleryImageSrc(item, chosenSrc) {
+          var sources = item && Array.isArray(item.sources) && item.sources.length ? item.sources : [chosenSrc];
+          var attempt = Math.max(sources.indexOf(chosenSrc), 0);
+          galleryImageEl.onerror = function () {
+            if (attempt >= sources.length - 1) {
+              galleryImageEl.onerror = null;
+              return;
+            }
+            attempt += 1;
+            galleryImageEl.setAttribute("src", sources[attempt]);
+          };
+          galleryImageEl.setAttribute("src", chosenSrc);
+        }
+
         function renderGallery() {
           if (!galleryImageEl) {
             return;
@@ -526,9 +633,9 @@
 
           var hasImages = galleryItems.length > 0;
           var current = hasImages ? galleryItems[galleryIndex] : { src: "assets/img/gallery-placeholder-1.svg", subtitle: "" };
-          var currentSrc = current && current.src ? current.src : "assets/img/gallery-placeholder-1.svg";
+          var currentSrc = pickImageSource(current) || "assets/img/gallery-placeholder-1.svg";
           var currentSubtitle = current && current.subtitle ? String(current.subtitle).trim() : "";
-          galleryImageEl.setAttribute("src", currentSrc);
+          setGalleryImageSrc(current, currentSrc);
           galleryImageEl.setAttribute("alt", (titleEl ? titleEl.textContent : "Project") + " gallery image");
           if (galleryCaptionEl) {
             if (currentSubtitle) {
@@ -559,6 +666,14 @@
           }
         }
 
+        /* Probing is async, so an overlay opened in the first moments after load may have
+           picked the fallback; re-render once the answer is in. */
+        onFormatProbe(function () {
+          if (isOpen) {
+            renderGallery();
+          }
+        });
+
         function stepGallery(delta) {
           if (galleryItems.length < 2) {
             return;
@@ -587,6 +702,48 @@
           overlay.classList.toggle("project-overlay--scrolling", !!needsScroll);
         }
 
+        /* The CSS sizes the image from its aspect ratio so it fills the free space, larger
+           or smaller than its own pixels. */
+        function syncLightboxRatio() {
+          if (lightboxImageEl.naturalWidth > 0 && lightboxImageEl.naturalHeight > 0) {
+            lightboxImageEl.style.setProperty("--lightbox-ratio", String(lightboxImageEl.naturalWidth / lightboxImageEl.naturalHeight));
+          }
+        }
+
+        function setLightboxContent(src, alt, subtitle) {
+          lightboxImageEl.setAttribute("src", src);
+          lightboxImageEl.setAttribute("alt", alt || "");
+          syncLightboxRatio();
+          if (lightboxCaptionEl) {
+            var text = String(subtitle || "").trim();
+            lightboxCaptionEl.textContent = text;
+            lightboxCaptionEl.hidden = !text;
+          }
+        }
+
+        /* The lightbox mirrors the gallery, so stepping it moves both in step and the
+           overlay behind shows the same image once the preview closes. */
+        function stepLightbox(delta) {
+          if (!isLightboxOpen || galleryItems.length < 2) {
+            return;
+          }
+          stepGallery(delta);
+          setLightboxContent(
+            galleryImageEl.getAttribute("src") || "",
+            galleryImageEl.getAttribute("alt") || "",
+            galleryCurrentSubtitle
+          );
+        }
+
+        function updateLightboxNav() {
+          var canNavigate = galleryItems.length > 1;
+          [lightboxControlsEl, lightboxPrevBtn, lightboxNextBtn].forEach(function (element) {
+            if (element) {
+              element.hidden = !canNavigate;
+            }
+          });
+        }
+
         function openLightbox(src, alt, subtitle) {
           if (!lightboxEl || !lightboxImageEl || !src) {
             return;
@@ -602,18 +759,8 @@
           }
 
           lightboxReturnFocus = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;
-          lightboxImageEl.setAttribute("src", src);
-          lightboxImageEl.setAttribute("alt", alt || "");
-          if (lightboxCaptionEl) {
-            var captionText = String(subtitle || "").trim();
-            if (captionText) {
-              lightboxCaptionEl.textContent = captionText;
-              lightboxCaptionEl.hidden = false;
-            } else {
-              lightboxCaptionEl.textContent = "";
-              lightboxCaptionEl.hidden = true;
-            }
-          }
+          setLightboxContent(src, alt, subtitle);
+          updateLightboxNav();
           lightboxEl.hidden = false;
           lightboxEl.setAttribute("aria-hidden", "true");
           overlay.classList.add("project-overlay--lightbox-open");
@@ -905,6 +1052,10 @@
           });
         });
 
+        if (lightboxImageEl) {
+          lightboxImageEl.addEventListener("load", syncLightboxRatio);
+        }
+
         if (closeBtn) {
           closeBtn.addEventListener("click", closeOverlay);
         }
@@ -949,6 +1100,20 @@
           });
         }
 
+        if (lightboxPrevBtn) {
+          lightboxPrevBtn.addEventListener("click", function (event) {
+            event.stopPropagation();
+            stepLightbox(-1);
+          });
+        }
+
+        if (lightboxNextBtn) {
+          lightboxNextBtn.addEventListener("click", function (event) {
+            event.stopPropagation();
+            stepLightbox(1);
+          });
+        }
+
         if (lightboxEl) {
           lightboxEl.addEventListener("click", function (event) {
             if (event.target === lightboxEl) {
@@ -967,9 +1132,13 @@
         });
 
         document.addEventListener("keydown", function (event) {
-          if (isOpen && !isLightboxOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+          if (isOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
             event.preventDefault();
-            stepGallery(event.key === "ArrowLeft" ? -1 : 1);
+            if (isLightboxOpen) {
+              stepLightbox(event.key === "ArrowLeft" ? -1 : 1);
+            } else {
+              stepGallery(event.key === "ArrowLeft" ? -1 : 1);
+            }
             return;
           }
           if (event.key === "Escape") {

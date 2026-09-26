@@ -1,36 +1,86 @@
 {
-  "control-performance-trust": {
-    "title": "Control, Performance & Trust",
-    "subtitle": "In Surveillance Society",
-    "meta": "Interaction Design, Intermediate Examination",
-    "summary": "Through a theory-informed practice, I developed an interactive exhibit shaped by continuous reflection on surveillance studies alongside iterative prototyping. On a theoretical level, I tested the thesis that surveillance acts as a form of preemptive control, altering notions of trust and the performance of the self in interpersonal relationships. This research materialized in a responsive live-loop installation: a mirror that not only reflects the viewer but also tracks and visualizes their presence in real time. It overlays traces of previous observers, transforming the act of looking into both self-observation and the monitoring of others: Placing participants in the role of watcher and watched simultaneously.",
+  "control-performance-trust-installation": {
+    "title": "Untitled (Mirror)",
+    "subtitle": "Control, Performance & Trust",
+    "meta": "Interaction Design, Media Art",
+    "summary": "A responsive live-loop installation: a mirror that not only reflects the viewer but also tracks and visualizes their presence in real time. It overlays traces of previous observers, transforming the act of looking into both self-observation and the monitoring of others: Placing participants in the role of watcher and watched simultaneously. The installation materializes the research of the accompanying essay on surveillance as a form of preemptive control.",
     "context": "Intermediate Examination at KISD.",
-    "approach": "Design Research.\nIterative prototyping.",
-    "outcome": "The outcome is a responsive live-loop mirror installation that reflects viewers while tracking and visualizing their presence in real time.",
+    "approach": "Iterative prototyping\nTheory-informed practice",
+    "outcome": "A responsive live-loop mirror installation that reflects viewers while tracking and visualizing their presence in real time.",
     "time": "June 2025 (8 weeks)",
     "semester": "4",
-    "result": "Essay\nInteractive Video Installation",
+    "result": "Interactive Video Installation",
     "team": "Solo Work",
-    "tools": "TouchDesigner\nPython\nCamera tracking\nInstallation prototyping",
-    "skills": "Project Management\nPrototyping\nStorytelling",
+    "tools": "TouchDesigner\nPython\nMotion Capture\nParticle Systems",
+    "skills": "Prototyping\nStorytelling\nInteraction Design\nProject Management",
     "gallery": [
-      { "src": "assets/img/control/control-01.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-02.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-03.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-04.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-05.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-06.jpg", "subtitle": "" },
-      { "src": "assets/img/control/control-07.jpg", "subtitle": "" }
+      {
+        "src": "assets/img/control-installation/control-installation-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-installation/control-installation-02.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-installation/control-installation-03.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-installation/control-installation-04.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-installation/control-installation-05.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-installation/control-installation-06.jpg",
+        "subtitle": ""
+      }
     ],
     "year": "2025",
     "links": [
       {
-        "label": "Full Work",
-        "href": "https://milanelsen.com/files/intermediate_elsen.pdf"
-      },
-      {
         "label": "Demo Video",
         "href": "https://milanelsen.com/files/intermediate_docu.mp4"
+      }
+    ],
+    "supervisingProfessor": "Fourth Semester\nSupervised by: Prof. Dr. Lasse Scherffig"
+  },
+  "control-performance-trust-publication": {
+    "title": "Control, Performance & Trust",
+    "subtitle": "In Surveillance Society",
+    "meta": "Design Research, Surveillance Studies",
+    "summary": "Through a theory-informed practice, I developed a written essay shaped by continuous reflection on surveillance studies alongside iterative prototyping. On a theoretical level, I tested the thesis that surveillance acts as a form of preemptive control, altering notions of trust and the performance of the self in interpersonal relationships. The research was published as a bound essay and materialized in an accompanying interactive installation.",
+    "context": "Intermediate Examination at KISD.",
+    "approach": "Design Research\nSurveillance studies",
+    "outcome": "A bound publication documenting the theoretical research and design process.",
+    "time": "June 2025 (8 weeks)",
+    "semester": "4",
+    "result": "Essay\nPublication",
+    "team": "Solo Work",
+    "tools": "Obsidian\ninDesign\nPhotoshop\nIllustrator\nDigital Printing",
+    "skills": "Design Research\nEditorial Design\nProject Management",
+    "gallery": [
+      {
+        "src": "assets/img/control-publication/control-publication-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-publication/control-publication-02.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/control-publication/control-publication-03.jpg",
+        "subtitle": ""
+      }
+    ],
+    "year": "2025",
+    "links": [
+      {
+        "label": "Download PDF",
+        "href": "https://milanelsen.com/files/intermediate_elsen.pdf"
       }
     ],
     "supervisingProfessor": "Fourth Semester\nSupervised by: Prof. Dr. Lasse Scherffig"
@@ -46,20 +96,82 @@
     "semester": "3",
     "result": "Concept\nInteractive Exhibit Prototype",
     "team": [
-      { "name": "Cora Kindermann", "href": "https://www.instagram.com/_coraalice_/" }
+      {
+        "name": "Cora Kindermann",
+        "href": "https://www.instagram.com/_coraalice_/"
+      }
     ],
     "tools": "3D Printing\nArduino\nStepper motors",
     "skills": "Physical Computing\nLaser Cutting,\n3D Printing,\nRemote Collaboration,\nInterface Design",
     "gallery": [
-      { "src": "assets/img/quantum-abacus/abacus-01.jpg", "subtitle": "" },
-      { "src": "assets/img/quantum-abacus/abacus-02.jpg", "subtitle": "" },
-      { "src": "assets/img/quantum-abacus/abacus-03.jpg", "subtitle": "" },
-      { "src": "assets/img/quantum-abacus/abacus-04.jpg", "subtitle": "" }
+      {
+        "src": "assets/img/quantum-abacus/abacus-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/abacus-02.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/abacus-03.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/abacus-04.jpg",
+        "subtitle": ""
+      }
     ],
     "year": "2024",
     "linkHref": "https://howtoshowoffquantumcomputing.cargo.site/winner",
     "linkLabel": "Visit project website",
     "supervisingProfessor": "Third Semester\nSupervised by: Prof. Dr. Lasse Scherffig & Prof. Nina Juric"
+  },
+  "unwinding": {
+    "title": "Unwinding",
+    "subtitle": "A Quiet Place for Hong Kong",
+    "meta": "Exhibition Pavilion",
+    "summary": "Unwinding is an exhibition pavilion concept developed during my exchange semester at the Hong Kong Polytechnic University. It responds to the shrinking availability of freely accessible communal space in a dense, highly commercialized city where staying somewhere is usually tied to consumption. Inspired by the rhythm and atmosphere of a bamboo forest, the layered double-spiral structure creates a gradual transition from the open city into a calm, intimate core: visually and sonically sheltered, but never fully alienated from the bustle outside. Built entirely from bamboo using traditional Hong Kong scaffolding techniques, the pavilion is proposed as a place to pause, linger, and rest without purpose or purchase.",
+    "context": "Pavilion concept for the Tai Kwun complex, developed in an elective course for submission to the deTour.hk design festival.",
+    "approach": "Critical Design\nIterative Prototyping\nSite-specific research",
+    "outcome": "A design proposal and scale model of a double-spiral bamboo pavilion for free public use.",
+    "time": "January 2026 - March 2026",
+    "semester": "5",
+    "result": "Design Proposal\nScale Model",
+    "team": [
+      {
+        "name": "Chantal Adam"
+      }
+    ],
+    "tools": "Model Making\nBlender\nAutodesk Fusion\nIllustrator",
+    "skills": "Spatial Design\nAtmospheric Design\nModel Making\nRemote Collaboration",
+    "gallery": [
+      {
+        "src": "assets/img/unwinding/unwinding-01.jpg",
+        "subtitle": "Draft Model"
+      },
+      {
+        "src": "assets/img/unwinding/unwinding-02.jpg",
+        "subtitle": "Entrance"
+      },
+      {
+        "src": "assets/img/unwinding/unwinding-03.jpg",
+        "subtitle": "Bamboo Structure"
+      },
+      {
+        "src": "assets/img/unwinding/unwinding-04.jpg",
+        "subtitle": "Bamboo Structure"
+      },
+      {
+        "src": "assets/img/unwinding/unwinding-05.jpg",
+        "subtitle": "Model materials"
+      },
+      {
+        "src": "assets/img/unwinding/unwinding-06.jpg",
+        "subtitle": "Form Research Model / Double Spiral Layout"
+      }
+    ],
+    "year": "2026",
+    "supervisingProfessor": "Fifth Semester\nExchange at The Hong Kong Polytechnic University"
   },
   "un-identikit": {
     "title": "Un-Identikit",
@@ -76,10 +188,22 @@
     "tools": "Speculative design methods, fashion prototyping",
     "skills": "Narrative Design,\nTextile Prototyping,\nCultural Analysis",
     "gallery": [
-      { "src": "assets/img/un-identikit/un-identikit-01.jpg", "subtitle": "" },
-      { "src": "assets/img/un-identikit/un-identikit-02.jpg", "subtitle": "Data ≠ Self" },
-      { "src": "assets/img/un-identikit/un-identikit-03.jpg", "subtitle": "Post Body" },
-      { "src": "assets/img/un-identikit/un-identikit-04.jpg", "subtitle": "Solidarity" }
+      {
+        "src": "assets/img/un-identikit/un-identikit-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/un-identikit/un-identikit-02.jpg",
+        "subtitle": "Data ≠ Self"
+      },
+      {
+        "src": "assets/img/un-identikit/un-identikit-03.jpg",
+        "subtitle": "Post Body"
+      },
+      {
+        "src": "assets/img/un-identikit/un-identikit-04.jpg",
+        "subtitle": "Solidarity"
+      }
     ],
     "year": "2025",
     "supervisingProfessor": "Fourth Semester\nSupervised by: Patricia Hepp"
@@ -122,7 +246,7 @@
       "assets/img/reverse-engineered/reverse-engineered-04.jpg"
     ],
     "year": "2024",
-    "supervisingProfessor": "Second Semester\nSupervised by: Prof. Jenz Gro\u00dfhans"
+    "supervisingProfessor": "Second Semester\nSupervised by: Prof. Jenz Großhans"
   },
   "happy-new-music-visuals": {
     "title": "Happy New Music Visuals",
@@ -135,17 +259,38 @@
     "semester": "3",
     "result": "Live Audio-Visual Performance",
     "team": [
-      { "name": "Leon Amir Scheunemann", "href": "https://leonscheunemann.com" }
+      {
+        "name": "Leon Amir Scheunemann",
+        "href": "https://leonscheunemann.com"
+      }
     ],
     "tools": "TouchDesigner\nPython",
     "skills": "Stage Design\nLive Performance\nVisual Storytelling",
     "gallery": [
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-01.jpg", "subtitle": "" },
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-02.jpg", "subtitle": "Performance Setting/Stage" },
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-03.jxl", "subtitle": "Performance Setting/Stage" },
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-04.jxl", "subtitle": "Performance Setting/Stage" },
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-05.jpg", "subtitle": "" },
-      { "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-06.jpg", "subtitle": "" }
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-02.jpg",
+        "subtitle": "Performance Setting/Stage"
+      },
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-03.jxl",
+        "subtitle": "Performance Setting/Stage"
+      },
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-04.jxl",
+        "subtitle": "Performance Setting/Stage"
+      },
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-05.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/happy-new-music-visuals/happy-new-music-visuals-06.jpg",
+        "subtitle": ""
+      }
     ],
     "year": "2025",
     "links": [
@@ -170,7 +315,10 @@
     "tools": "Swift\nSwiftUI\nCoreData\nApp Store toolchain",
     "skills": "End-to-end product lifecycle\nProject management\nMarketing",
     "gallery": [
-      { "src": "assets/img/happy-birthday-widget/happy-birthday-widget.png", "subtitle": "" }
+      {
+        "src": "assets/img/happy-birthday-widget/happy-birthday-widget.png",
+        "subtitle": ""
+      }
     ],
     "year": "2023",
     "supervisingProfessor": ""
@@ -189,7 +337,10 @@
     "tools": "Swift\nSwiftUI\nFigma\nIllustrator",
     "skills": "Product definition\nUser Flows\nRapid Prototyping",
     "gallery": [
-      { "src": "assets/img/zeichenmeister/zeichenmeister.png", "subtitle": "" }
+      {
+        "src": "assets/img/zeichenmeister/zeichenmeister.png",
+        "subtitle": ""
+      }
     ],
     "year": "2023",
     "links": [

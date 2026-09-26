@@ -79,5 +79,9 @@
     <button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button>
     <img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt="">
     <p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p>
+    <div class="project-overlay-lightbox-controls" data-overlay-lightbox-controls aria-label="Image navigation">
+      <button class="project-overlay-gallery-nav project-overlay-lightbox-nav project-overlay-lightbox-nav--prev" type="button" aria-label="Previous image" data-overlay-lightbox-prev><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <button class="project-overlay-gallery-nav project-overlay-gallery-nav--next project-overlay-lightbox-nav project-overlay-lightbox-nav--next" type="button" aria-label="Next image" data-overlay-lightbox-next><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+    </div>
   </div>
 </div>

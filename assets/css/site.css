@@ -917,7 +917,7 @@ body.header--menu-open {
   }
 
   .home-page .intro .intro-copy:first-of-type {
-    margin-top: 3mm;
+    margin-top: 0;
   }
 
   .home-page .footer-notice--mobile {
@@ -1704,13 +1704,20 @@ body.header--menu-open {
 
   .home-page .intro {
     --portrait-w: min(300px, calc(30vw - 3.5rem));
+    row-gap: 0;
   }
 
   .home-page .intro-portrait {
     width: var(--portrait-size);
     margin-top: 0;
-    margin-bottom: 1.8rem;
+    /* Gaps are swapped by visible glyph edges, not boxes; the name/subhead are
+       JS-scaled to the portrait width, so the side-bearing offset scales with it. */
+    margin-bottom: calc(1.1rem + var(--portrait-w) * 0.01813);
     order: -1;
+  }
+
+  .home-page .intro-subhead {
+    margin-top: calc(1.8rem + var(--space-4) - var(--portrait-w) * 0.01813);
   }
 
   .home-page .intro::before {
@@ -1720,8 +1727,8 @@ body.header--menu-open {
 
   .home-page #projects {
     width: auto;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: clamp(0.8rem, 2vw, 2rem);
+    margin-right: clamp(0.8rem, 2vw, 2rem);
     max-width: none;
     padding-top: 0;
   }
@@ -3147,12 +3154,15 @@ body.header--menu-open {
   display: none !important;
 }
 
+/* Fills the available box at the image's aspect ratio, scaling small images up too.
+   --lightbox-ratio (width / height) is set from the loaded image in project-overlay.js. */
 .project-overlay-lightbox-image {
-  max-width: min(calc(100dvw - 5.5rem), 1400px);
-  max-height: 90vh;
-  max-height: 90dvh;
-  width: auto;
+  --lightbox-max-w: min(calc(100dvw - 5.5rem), 1400px);
+  --lightbox-max-h: 90dvh;
+  width: min(var(--lightbox-max-w), calc(var(--lightbox-max-h) * var(--lightbox-ratio, 1.5)));
   height: auto;
+  max-width: var(--lightbox-max-w);
+  max-height: var(--lightbox-max-h);
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.28));
@@ -3250,6 +3260,64 @@ body.header--menu-open {
   .project-overlay-lightbox-stage > .project-overlay-close {
     top: clamp(0.75rem, 2vw, 1rem);
     right: clamp(0.75rem, 2vw, 1rem);
+  }
+}
+
+/* Lightbox navigation: same circular control as the gallery arrows. On wide screens the
+   arrows sit against the left and right edges, clear of the image at any aspect ratio. */
+.project-overlay-lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: clamp(2.2rem, 3.2vw, 2.8rem);
+  height: clamp(2.2rem, 3.2vw, 2.8rem);
+}
+
+/* Match the close button, whose cross is drawn from two 1px bars. non-scaling-stroke
+   keeps the chevron at 1px whatever size the button takes. */
+.project-overlay-lightbox-nav .project-overlay-gallery-nav-icon path {
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.project-overlay-lightbox-nav--prev {
+  left: clamp(0.75rem, 2vw, 1rem);
+}
+
+.project-overlay-lightbox-nav--next {
+  right: clamp(0.75rem, 2vw, 1rem);
+}
+
+.project-overlay-lightbox-nav[hidden] {
+  display: none !important;
+}
+
+/* Phones have no room beside the image, so the arrows drop into the flow below it. */
+@media (max-width: 700px) {
+  /* Same spacing as the gallery controls in the overlay behind. */
+  .project-overlay-lightbox-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.35rem;
+  }
+
+  /* Stays relative, not static: the chevron inside is absolutely positioned and must
+     keep the button as its containing block. */
+  .project-overlay-lightbox-nav {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: clamp(1.8rem, 2.2vw, 2.4rem);
+    height: clamp(1.8rem, 2.2vw, 2.4rem);
+  }
+
+  /* Leave room under the image for the arrows and any caption. */
+  .project-overlay-lightbox-image {
+    --lightbox-max-h: 72dvh;
   }
 }
 
