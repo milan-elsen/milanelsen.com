@@ -216,6 +216,15 @@ html.socials-page {
   background: var(--ink);
 }
 
+/* On phones iOS Safari colours its status bar and toolbar from the page background, so
+   the green accent behind the page (seen in the overscroll bounce) is desktop-only. */
+@media (max-width: 600px) {
+  html.home-page,
+  html.socials-page {
+    background: #fff;
+  }
+}
+
 body.home-page {
   background: transparent;
   position: relative;
@@ -519,7 +528,7 @@ video {
   opacity: 0;
   visibility: hidden;
   will-change: opacity, visibility;
-  transition: visibility 600ms cubic-bezier(.4, 0, .2, 1), opacity 400ms cubic-bezier(.4, 0, .2, 1);
+  transition: visibility 400ms cubic-bezier(.4, 0, .2, 1), opacity 400ms cubic-bezier(.4, 0, .2, 1);
   user-select: none;
   text-align: center;
   pointer-events: auto;
@@ -602,6 +611,10 @@ video {
 .header-menu-nav-item--email .header-menu-nav-item-content,
 .header-menu-nav-item--note .header-menu-nav-item-content {
   width: var(--menu-email-width);
+}
+
+.header-menu-nav-item--email .header-menu-nav-item-content {
+  text-transform: none;
 }
 
 .header-menu-nav-item--spacer {
@@ -3004,12 +3017,31 @@ body.header--menu-open {
 }
 
 .project-overlay-gallery-frame {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
   width: 100%;
   height: 100%;
   min-height: 0;
+}
+
+/* While the carousel slides, pictures are cut off at the frame's sides; above and below
+   it leaves room for the drop shadow. */
+.project-overlay-gallery-frame.is-sliding {
+  clip-path: inset(-3rem 0 -4rem 0);
+}
+
+/* The neighbouring picture during a carousel drag or slide; project-overlay.js gives it
+   the same box as the real image. */
+.project-overlay-carousel-peek {
+  position: absolute;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+  pointer-events: none;
+  transition: none;
+  will-change: transform;
 }
 
 .project-overlay-gallery-controls {
@@ -3051,6 +3083,10 @@ body.header--menu-open {
   object-position: center;
   background: transparent;
   filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.28));
+  touch-action: pan-y pinch-zoom;
+  /* Its own compositing layer from the start, so the first frame of a carousel drag
+     doesn't stall while one is created and the shadow repainted. */
+  will-change: transform;
 }
 
 .project-overlay-gallery-image.is-clickable {
@@ -3144,6 +3180,10 @@ body.header--menu-open {
   pointer-events: auto;
   transition: opacity 180ms ease;
   will-change: opacity;
+  /* project-overlay.js handles every touch gesture here (swipe, pinch, pan), so the
+     browser must not scroll or zoom the page underneath; an enlarged image is clipped. */
+  touch-action: none;
+  overflow: hidden;
 }
 
 .project-overlay-lightbox[aria-hidden="false"] {
@@ -3170,6 +3210,17 @@ body.header--menu-open {
   transform: scale(0.985);
   transition: opacity 180ms ease, transform 220ms ease;
   will-change: opacity, transform;
+}
+
+/* Zoom transforms follow the fingers or wheel directly; the base transition still eases
+   the image back when the zoom resets. */
+.project-overlay-lightbox-image.is-zoomed {
+  transition: opacity 180ms ease;
+  cursor: grab;
+}
+
+.project-overlay-lightbox-image.is-dragging {
+  cursor: grabbing;
 }
 
 .project-overlay-lightbox[aria-hidden="false"] .project-overlay-lightbox-image {
@@ -3263,15 +3314,76 @@ body.header--menu-open {
   }
 }
 
-/* Lightbox navigation: same circular control as the gallery arrows. On wide screens the
-   arrows sit against the left and right edges, clear of the image at any aspect ratio. */
+/* Lightbox layout: full-screen rows. The equal 1fr tracks keep the image centred and put
+   the arrows in the middle of the white space beneath it. The stage lets taps through so
+   the backdrop still closes the preview. */
+.project-overlay-lightbox-stage {
+  display: grid;
+  grid-template-rows: 1fr auto auto 1fr;
+  row-gap: 0;
+  justify-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  pointer-events: none;
+}
+
+.project-overlay-lightbox-stage > * {
+  pointer-events: auto;
+}
+
+/* Leave room for the arrows below the image, and the same again above it. */
+.project-overlay-lightbox-image {
+  grid-row: 2;
+  --lightbox-max-h: calc(100dvh - 28rem);
+}
+
+/* Row gaps would push the arrows off-centre, so the caption carries its own spacing. */
+.project-overlay-lightbox-caption {
+  grid-row: 3;
+  margin-top: 0.35rem;
+}
+
+/* The chevrons are drawn with ~1/5 of the button as padding on each side, so this gap
+   leaves about 4.5rem between the two lines. */
+.project-overlay-lightbox-controls {
+  grid-row: 4;
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Lightbox navigation: bare, tall chevrons without the gallery's circle; the button keeps
+   a 2:3 hit area around the drawn line. 126 × 189 px draws each chevron about 55 × 110 px.
+   Stays relative, not static: the chevron inside is absolutely positioned and must keep
+   the button as its containing block. */
 .project-overlay-lightbox-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   z-index: 3;
-  width: clamp(2.2rem, 3.2vw, 2.8rem);
-  height: clamp(2.2rem, 3.2vw, 2.8rem);
+  width: 126px;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  border: 0;
+  border-radius: 0;
+  transition: opacity 180ms ease;
+}
+
+.project-overlay-lightbox-nav .project-overlay-gallery-nav-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.project-overlay-lightbox-nav:hover {
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+.project-overlay-lightbox-nav:focus-visible {
+  box-shadow: none;
+  outline: 1px solid #000;
+  outline-offset: 2px;
 }
 
 /* Match the close button, whose cross is drawn from two 1px bars. non-scaling-stroke
@@ -3281,43 +3393,31 @@ body.header--menu-open {
   vector-effect: non-scaling-stroke;
 }
 
-.project-overlay-lightbox-nav--prev {
-  left: clamp(0.75rem, 2vw, 1rem);
-}
-
-.project-overlay-lightbox-nav--next {
-  right: clamp(0.75rem, 2vw, 1rem);
-}
-
 .project-overlay-lightbox-nav[hidden] {
   display: none !important;
 }
 
-/* Phones have no room beside the image, so the arrows drop into the flow below it. */
 @media (max-width: 700px) {
-  /* Same spacing as the gallery controls in the overlay behind. */
-  .project-overlay-lightbox-controls {
-    display: flex;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 0.35rem;
+  /* Comfortable tap targets for the gallery arrows on phones. */
+  .project-overlay-gallery-nav {
+    width: 44px;
+    height: 44px;
   }
 
-  /* Stays relative, not static: the chevron inside is absolutely positioned and must
-     keep the button as its containing block. */
+  /* The lightbox arrows share the gallery class; keep their own size. */
   .project-overlay-lightbox-nav {
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    transform: none;
-    width: clamp(1.8rem, 2.2vw, 2.4rem);
-    height: clamp(1.8rem, 2.2vw, 2.4rem);
+    width: 126px;
+    height: auto;
   }
 
-  /* Leave room under the image for the arrows and any caption. */
-  .project-overlay-lightbox-image {
-    --lightbox-max-h: 72dvh;
+  /* Each button carries ~35px of empty space beside its line, so the buttons overlap by
+     2rem to bring the two lines ~39px apart; each keeps a hit area over 90px wide. */
+  .project-overlay-lightbox-controls {
+    gap: 0;
+  }
+
+  .project-overlay-lightbox-nav--next {
+    margin-left: -2rem;
   }
 }
 
@@ -3327,6 +3427,12 @@ body.home-page.project-overlay-open {
 
 body.home-page > * {
   transition: filter 220ms ease, opacity 220ms ease;
+}
+
+/* The menu is also a direct child of <body>; it keeps its own fade, with visibility held
+   until the fade-out has finished so closing doesn't cut it off. */
+body.home-page > .header-menu {
+  transition: visibility 400ms cubic-bezier(.4, 0, .2, 1), opacity 400ms cubic-bezier(.4, 0, .2, 1);
 }
 
 body.home-page.project-overlay-open > :not(.project-overlay-root) {

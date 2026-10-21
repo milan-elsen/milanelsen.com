@@ -31,7 +31,7 @@
     "  </div>",
     "</div>",
     '<div class="project-overlay-lightbox" data-overlay-lightbox hidden aria-hidden="true">',
-    '  <div class="project-overlay-lightbox-stage"><button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button><img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt=""><p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p><div class="project-overlay-lightbox-controls" data-overlay-lightbox-controls aria-label="Image navigation"><button class="project-overlay-gallery-nav project-overlay-lightbox-nav project-overlay-lightbox-nav--prev" type="button" aria-label="Previous image" data-overlay-lightbox-prev><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button class="project-overlay-gallery-nav project-overlay-gallery-nav--next project-overlay-lightbox-nav project-overlay-lightbox-nav--next" type="button" aria-label="Next image" data-overlay-lightbox-next><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div></div>',
+    '  <div class="project-overlay-lightbox-stage"><button class="project-overlay-close" type="button" aria-label="Close image preview" data-overlay-lightbox-close>&times;</button><img class="project-overlay-lightbox-image" data-overlay-lightbox-image src="" alt=""><p class="project-overlay-lightbox-caption" data-overlay-lightbox-caption hidden></p><div class="project-overlay-lightbox-controls" data-overlay-lightbox-controls aria-label="Image navigation"><button class="project-overlay-gallery-nav project-overlay-lightbox-nav project-overlay-lightbox-nav--prev" type="button" aria-label="Previous image" data-overlay-lightbox-prev><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 48" aria-hidden="true" focusable="false"><path d="M19 10L5 24l14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button class="project-overlay-gallery-nav project-overlay-gallery-nav--next project-overlay-lightbox-nav project-overlay-lightbox-nav--next" type="button" aria-label="Next image" data-overlay-lightbox-next><svg class="project-overlay-gallery-nav-icon" viewBox="0 0 24 48" aria-hidden="true" focusable="false"><path d="M19 10L5 24l14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div></div>',
     "</div>",
   ].join("\n");
 
@@ -647,6 +647,7 @@
             }
           }
           galleryCurrentSubtitle = currentSubtitle;
+          warmNeighbours();
           var canOpenLightbox = hasImages && !/gallery-placeholder-\d+\.svg$/i.test(currentSrc);
           galleryImageEl.classList.toggle("is-clickable", canOpenLightbox);
           galleryImageEl.setAttribute("tabindex", canOpenLightbox ? "0" : "-1");
@@ -711,6 +712,7 @@
         }
 
         function setLightboxContent(src, alt, subtitle) {
+          resetZoom();
           lightboxImageEl.setAttribute("src", src);
           lightboxImageEl.setAttribute("alt", alt || "");
           syncLightboxRatio();
@@ -733,6 +735,654 @@
             galleryImageEl.getAttribute("alt") || "",
             galleryCurrentSubtitle
           );
+        }
+
+        function neighbourSource(delta) {
+          if (galleryItems.length < 2) {
+            return "";
+          }
+          var item = galleryItems[(galleryIndex + delta + galleryItems.length) % galleryItems.length];
+          return pickImageSource(item) || "";
+        }
+
+        /* Fetches and decodes the pictures on either side ahead of time, so a slide never
+           starts with a half-loaded picture or decodes one mid-animation. The cache keeps
+           the decoded images alive; it only ever holds this project's few pictures. */
+        var decodedImages = {};
+
+        function warmImage(src) {
+          if (!src || decodedImages[src]) {
+            return;
+          }
+          var image = new Image();
+          image.decoding = "async";
+          image.src = src;
+          decodedImages[src] = image;
+          if (image.decode) {
+            image.decode().catch(function () {});
+          }
+        }
+
+        function warmNeighbours() {
+          warmImage(neighbourSource(1));
+          warmImage(neighbourSource(-1));
+        }
+
+        /* Resolves once `image` can be drawn, or after `ms` at the latest. */
+        function whenDecoded(image, ms) {
+          var decoded = image.decode ? image.decode().catch(function () {}) : Promise.resolve();
+          return Promise.race([decoded, new Promise(function (resolve) { window.setTimeout(resolve, ms); })]);
+        }
+
+        /* Carousel like a phone's photo viewer: during a horizontal drag the picture follows
+           the finger exactly, with the neighbouring picture (a throwaway "peek" image in the
+           same box) entering from the side it moves away from. On release it completes when
+           dragged past a quarter of the width or flicked, and springs back otherwise, so
+           reversing the drag cancels it. Buttons and keys run the same slide. Vertical drags
+           still scroll (touch-action: pan-y on the gallery), and the click a drag leaves
+           behind is swallowed so it doesn't open the lightbox or press an arrow. */
+        function createCarousel(imgEl, options) {
+          var gap = 24;
+          var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var peek = null;
+          var peekDelta = 0;
+          var settling = null;
+          var drag = null;
+          var swallowClick = false;
+
+          /* One "page" of the carousel: the width of the area the picture sits in (the whole
+             screen in the lightbox, the frame in the overlay), so the outgoing picture
+             always leaves it completely, however narrow the picture itself is. */
+          function boxWidth() {
+            return Math.max(imgEl.offsetWidth, imgEl.parentNode.clientWidth) + gap;
+          }
+
+          function removePeek() {
+            if (peek && peek.parentNode) {
+              peek.parentNode.removeChild(peek);
+            }
+            peek = null;
+            peekDelta = 0;
+          }
+
+          function ensurePeek(delta) {
+            if (peek && peekDelta === delta) {
+              return peek;
+            }
+            removePeek();
+            var src = options.neighbour(delta);
+            if (!src) {
+              return null;
+            }
+            peek = document.createElement("img");
+            peek.className = imgEl.className;
+            ["is-zoomed", "is-dragging", "is-clickable"].forEach(function (name) {
+              peek.classList.remove(name);
+            });
+            peek.classList.add("project-overlay-carousel-peek");
+            peek.alt = "";
+            peek.setAttribute("aria-hidden", "true");
+            /* The copied class gives it the image's grid row, which would make an
+               absolutely placed box measure from that row instead of the parent, and
+               the lightbox image's transform transition, which would make it trail the
+               finger. Inline styles beat both. */
+            peek.style.gridArea = "auto";
+            peek.style.transition = "none";
+            peek.style.left = imgEl.offsetLeft + "px";
+            peek.style.top = imgEl.offsetTop + "px";
+            peek.style.width = imgEl.offsetWidth + "px";
+            peek.style.height = imgEl.offsetHeight + "px";
+            peek.style.transform = "translateX(" + delta * boxWidth() + "px)";
+            peek.src = src;
+            imgEl.parentNode.appendChild(peek);
+            peekDelta = delta;
+            return peek;
+          }
+
+          function place(offset) {
+            imgEl.style.transition = "none";
+            imgEl.style.transform = "translateX(" + offset + "px)";
+            if (peek) {
+              peek.style.transform = "translateX(" + (offset + peekDelta * boxWidth()) + "px)";
+            }
+          }
+
+          /* Drops the offset without letting the CSS transform transition replay it. */
+          function clearInline() {
+            imgEl.style.transition = "none";
+            imgEl.style.removeProperty("transform");
+            void imgEl.offsetWidth;
+            imgEl.style.removeProperty("transition");
+            imgEl.parentNode.classList.remove("is-sliding");
+          }
+
+          function finishSettling() {
+            if (settling) {
+              settling();
+            }
+          }
+
+          /* Animates from `offset` to rest (commit = false) or one picture over. The peek
+             stays on top until the real image has decoded the same file, so the swap never
+             flashes. */
+          function settle(offset, delta, commit, speed) {
+            var width = boxWidth();
+            var target = commit ? -delta * width : 0;
+            var duration = reduceMotion ? 0 : Math.max(160, Math.min(380, Math.abs(target - offset) / Math.max(speed || 0, 1.1)));
+            var easing = "cubic-bezier(0.2, 0.7, 0.3, 1)";
+            var animations = [];
+            var done = false;
+
+            function complete() {
+              if (done) {
+                return;
+              }
+              done = true;
+              settling = null;
+              animations.forEach(function (animation) {
+                animation.cancel();
+              });
+              var leftover = peek;
+              peek = null;
+              peekDelta = 0;
+              clearInline();
+              if (!commit) {
+                if (leftover && leftover.parentNode) {
+                  leftover.parentNode.removeChild(leftover);
+                }
+                return;
+              }
+              options.commit(delta);
+              if (!leftover) {
+                return;
+              }
+              leftover.style.transform = "none";
+              var drop = function () {
+                if (leftover.parentNode) {
+                  leftover.parentNode.removeChild(leftover);
+                }
+              };
+              var decoded = imgEl.decode ? imgEl.decode().catch(function () {}) : Promise.resolve();
+              Promise.race([decoded, new Promise(function (resolve) { window.setTimeout(resolve, 400); })]).then(drop);
+            }
+
+            settling = complete;
+            if (!duration || !imgEl.animate) {
+              complete();
+              return;
+            }
+            imgEl.parentNode.classList.add("is-sliding");
+            imgEl.style.transition = "none";
+            imgEl.style.transform = "translateX(" + target + "px)";
+            animations.push(imgEl.animate(
+              [{ transform: "translateX(" + offset + "px)" }, { transform: "translateX(" + target + "px)" }],
+              { duration: duration, easing: easing }
+            ));
+            if (peek) {
+              var peekFrom = offset + peekDelta * width;
+              var peekTo = target + peekDelta * width;
+              peek.style.transform = "translateX(" + peekTo + "px)";
+              animations.push(peek.animate(
+                [{ transform: "translateX(" + peekFrom + "px)" }, { transform: "translateX(" + peekTo + "px)" }],
+                { duration: duration, easing: easing }
+              ));
+            }
+            animations[0].onfinish = complete;
+            /* Hidden tabs pause animations; the timer still lands the slide. */
+            window.setTimeout(complete, duration + 100);
+          }
+
+          function step(delta) {
+            finishSettling();
+            if (!options.enabled()) {
+              options.commit(delta);
+              return;
+            }
+            var incoming = ensurePeek(delta);
+            if (!incoming) {
+              options.commit(delta);
+              return;
+            }
+            /* Waits (briefly) for the incoming picture so the slide runs on a drawn image;
+               a press in the meantime lands this step at once and starts the next. */
+            var started = false;
+            settling = function () {
+              if (!started) {
+                started = true;
+                settling = null;
+                removePeek();
+                options.commit(delta);
+              }
+            };
+            whenDecoded(incoming, 250).then(function () {
+              if (!started) {
+                started = true;
+                settle(0, delta, true, 0);
+              }
+            });
+          }
+
+          function cancelDrag() {
+            if (drag && drag.active) {
+              settle(drag.dx, peekDelta || 1, false, 0);
+            }
+            drag = null;
+          }
+
+          function attach(element) {
+            element.addEventListener("touchstart", function (event) {
+              if (event.touches.length !== 1) {
+                cancelDrag();
+                return;
+              }
+              finishSettling();
+              if (!options.enabled() || !options.neighbour(1)) {
+                drag = null;
+                return;
+              }
+              var touch = event.touches[0];
+              drag = {
+                startX: touch.clientX,
+                startY: touch.clientY,
+                dx: 0,
+                active: false,
+                lastX: touch.clientX,
+                lastTime: event.timeStamp,
+                speed: 0
+              };
+            }, { passive: true });
+
+            element.addEventListener("touchmove", function (event) {
+              if (!drag || event.touches.length !== 1) {
+                return;
+              }
+              var touch = event.touches[0];
+              var dx = touch.clientX - drag.startX;
+              var dy = touch.clientY - drag.startY;
+              /* The browser commits to scrolling within the first few pixels, so while the
+                 touch leans sideways it is claimed before that can happen; a clearly
+                 vertical one is let go to scroll the page as usual. */
+              if (!drag.active) {
+                if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 6) {
+                  drag = null;
+                  return;
+                }
+                if (Math.abs(dx) >= Math.abs(dy) && event.cancelable) {
+                  event.preventDefault();
+                }
+                if (Math.abs(dx) < 8) {
+                  return;
+                }
+                drag.active = true;
+                imgEl.parentNode.classList.add("is-sliding");
+              }
+              if (event.cancelable) {
+                event.preventDefault();
+              }
+              var elapsed = event.timeStamp - drag.lastTime;
+              if (elapsed > 0) {
+                drag.speed = 0.6 * ((touch.clientX - drag.lastX) / elapsed) + 0.4 * drag.speed;
+              }
+              drag.lastX = touch.clientX;
+              drag.lastTime = event.timeStamp;
+              drag.dx = dx;
+              if (dx !== 0) {
+                ensurePeek(dx < 0 ? 1 : -1);
+              }
+              place(dx);
+            }, { passive: false });
+
+            function endDrag(event) {
+              if (!drag) {
+                return;
+              }
+              var current = drag;
+              drag = null;
+              if (!current.active) {
+                return;
+              }
+              swallowClick = true;
+              window.setTimeout(function () {
+                swallowClick = false;
+              }, 400);
+              /* A pause before lifting the finger means no flick. */
+              var speed = event.timeStamp - current.lastTime > 80 ? 0 : current.speed;
+              var delta = current.dx < 0 ? 1 : -1;
+              var along = -delta;
+              var commit = event.type === "touchend" && (
+                (Math.abs(current.dx) > boxWidth() * 0.25 && speed * along > -0.3) ||
+                (Math.abs(current.dx) > 10 && speed * along > 0.35)
+              );
+              settle(current.dx, delta, commit, Math.abs(speed));
+            }
+
+            element.addEventListener("touchend", endDrag, { passive: true });
+            element.addEventListener("touchcancel", endDrag, { passive: true });
+
+            element.addEventListener("click", function (event) {
+              if (swallowClick) {
+                swallowClick = false;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+              }
+            }, true);
+          }
+
+          return { attach: attach, step: step, finish: finishSettling };
+        }
+
+        /* Lightbox zoom: pinch on touch screens, trackpad pinch or the mouse wheel on
+           desktop. A pinch works like Apple Photos: the picture stays pinned under the
+           fingers, so moving them drags it along (on a trackpad, moving two fingers pans),
+           it may shrink a little or sit off-centre while held, and it springs back to its
+           normal size and place on release. Wheel and double-click zoom stay instead,
+           within the image's bounds, can be dragged around, and reset on a second
+           double-click, a step to another image or closing. */
+        var zoomScale = 1;
+        var zoomX = 0;
+        var zoomY = 0;
+        var zoomMax = 5;
+        var zoomGestureMin = 0.5;
+
+        function renderZoom() {
+          if (zoomScale === 1 && zoomX === 0 && zoomY === 0) {
+            lightboxImageEl.style.removeProperty("transform");
+            lightboxImageEl.classList.remove("is-zoomed");
+            return;
+          }
+          lightboxImageEl.classList.add("is-zoomed");
+          lightboxImageEl.style.transform = "translate(" + zoomX + "px, " + zoomY + "px) scale(" + zoomScale + ")";
+        }
+
+        /* Settled zoom: at least normal size, and the enlarged image always covers its own
+           unzoomed box. */
+        function applyZoom() {
+          if (zoomScale <= 1.001) {
+            zoomScale = 1;
+            zoomX = 0;
+            zoomY = 0;
+          } else {
+            zoomScale = Math.min(zoomMax, zoomScale);
+            var maxX = (lightboxImageEl.offsetWidth * (zoomScale - 1)) / 2;
+            var maxY = (lightboxImageEl.offsetHeight * (zoomScale - 1)) / 2;
+            zoomX = Math.max(-maxX, Math.min(maxX, zoomX));
+            zoomY = Math.max(-maxY, Math.min(maxY, zoomY));
+          }
+          renderZoom();
+        }
+
+        /* Held gesture: free placement, only the scale is kept within reason. */
+        function applyGestureZoom() {
+          zoomScale = Math.max(zoomGestureMin, Math.min(zoomMax, zoomScale));
+          renderZoom();
+        }
+
+        /* Removing the zoom transform lets the CSS transition ease the image home. */
+        function resetZoom() {
+          zoomScale = 1;
+          zoomX = 0;
+          zoomY = 0;
+          renderZoom();
+        }
+
+        /* A new gesture starts from what is on screen, which may still be easing back
+           from the last one. */
+        function syncZoomFromScreen() {
+          var rendered = new DOMMatrixReadOnly(window.getComputedStyle(lightboxImageEl).transform);
+          zoomScale = rendered.a || 1;
+          zoomX = rendered.e;
+          zoomY = rendered.f;
+        }
+
+        /* Where the image's centre sits with no zoom applied. */
+        function zoomRestCentre() {
+          var rect = lightboxImageEl.getBoundingClientRect();
+          var rendered = new DOMMatrixReadOnly(window.getComputedStyle(lightboxImageEl).transform);
+          return { x: rect.left + rect.width / 2 - rendered.e, y: rect.top + rect.height / 2 - rendered.f };
+        }
+
+        /* Wheel steps: keeps the image point under (clientX, clientY) in place while the
+           scale changes. */
+        function zoomAt(nextScale, clientX, clientY, held) {
+          var centre = zoomRestCentre();
+          var offsetX = clientX - centre.x;
+          var offsetY = clientY - centre.y;
+          var scale = Math.max(held ? zoomGestureMin : 1, Math.min(zoomMax, nextScale));
+          zoomX = offsetX - (scale * (offsetX - zoomX)) / zoomScale;
+          zoomY = offsetY - (scale * (offsetY - zoomY)) / zoomScale;
+          zoomScale = scale;
+          if (held) {
+            applyGestureZoom();
+          } else {
+            applyZoom();
+          }
+        }
+
+        function bindLightboxZoom() {
+          var touchCount = 0;
+          var touchPinch = null;
+          var pin = null;
+          var panning = false;
+          var panStartX = 0;
+          var panStartY = 0;
+          var panOriginX = 0;
+          var panOriginY = 0;
+          var mouseDragged = false;
+          var trackpadHeld = false;
+          var trackpadTimer = 0;
+
+          /* Pins the image point under (clientX, clientY); moving that point later carries
+             the image with it. */
+          function pinAt(clientX, clientY) {
+            syncZoomFromScreen();
+            var centre = zoomRestCentre();
+            pin = {
+              centreX: centre.x,
+              centreY: centre.y,
+              pointX: (clientX - centre.x - zoomX) / zoomScale,
+              pointY: (clientY - centre.y - zoomY) / zoomScale,
+              scale: zoomScale
+            };
+          }
+
+          function movePin(scale, clientX, clientY) {
+            zoomScale = Math.max(zoomGestureMin, Math.min(zoomMax, scale));
+            zoomX = clientX - pin.centreX - zoomScale * pin.pointX;
+            zoomY = clientY - pin.centreY - zoomScale * pin.pointY;
+            applyGestureZoom();
+          }
+
+          function releaseGesture() {
+            pin = null;
+            touchPinch = null;
+            trackpadHeld = false;
+            window.clearTimeout(trackpadTimer);
+            resetZoom();
+          }
+
+          function touchGap(touches) {
+            return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+          }
+
+          function touchMid(touches) {
+            return {
+              x: (touches[0].clientX + touches[1].clientX) / 2,
+              y: (touches[0].clientY + touches[1].clientY) / 2
+            };
+          }
+
+          function startTouchPinch(touches) {
+            var mid = touchMid(touches);
+            pinAt(mid.x, mid.y);
+            touchPinch = { gap: touchGap(touches) };
+          }
+
+          function startPan(clientX, clientY) {
+            panning = true;
+            panStartX = clientX;
+            panStartY = clientY;
+            panOriginX = zoomX;
+            panOriginY = zoomY;
+          }
+
+          function movePan(clientX, clientY) {
+            zoomX = panOriginX + clientX - panStartX;
+            zoomY = panOriginY + clientY - panStartY;
+            applyZoom();
+          }
+
+          /* A trackpad never says when the fingers lift; the events just stop. */
+          function holdTrackpad() {
+            trackpadHeld = true;
+            window.clearTimeout(trackpadTimer);
+            trackpadTimer = window.setTimeout(releaseGesture, 250);
+          }
+
+          /* Wheel: a mouse notch is ~100px of deltaY; trackpad pinches arrive as small
+             ctrlKey deltas, so they get a stronger factor. While a trackpad pinch is held,
+             plain wheel deltas are the two fingers moving and pan the image instead. */
+          lightboxEl.addEventListener("wheel", function (event) {
+            if (!isLightboxOpen) {
+              return;
+            }
+            event.preventDefault();
+            var unit = event.deltaMode === 1 ? 16 : 1;
+            if (event.ctrlKey) {
+              if (!trackpadHeld) {
+                syncZoomFromScreen();
+              }
+              holdTrackpad();
+              zoomAt(zoomScale * Math.exp(-event.deltaY * unit * 0.01), event.clientX, event.clientY, true);
+              return;
+            }
+            if (trackpadHeld) {
+              holdTrackpad();
+              zoomX -= event.deltaX * unit;
+              zoomY -= event.deltaY * unit;
+              if (pin) {
+                pin.centreX -= event.deltaX * unit;
+                pin.centreY -= event.deltaY * unit;
+              }
+              applyGestureZoom();
+              return;
+            }
+            zoomAt(zoomScale * Math.exp(-event.deltaY * unit * 0.0015), event.clientX, event.clientY, false);
+          }, { passive: false });
+
+          /* Safari reports trackpad pinches as gesture events rather than ctrlKey wheels.
+             On iOS the same events accompany touch pinches, which the touch handlers own. */
+          lightboxEl.addEventListener("gesturestart", function (event) {
+            event.preventDefault();
+            if (touchCount === 0) {
+              trackpadHeld = true;
+              window.clearTimeout(trackpadTimer);
+              pinAt(event.clientX, event.clientY);
+            }
+          });
+
+          lightboxEl.addEventListener("gesturechange", function (event) {
+            event.preventDefault();
+            if (touchCount === 0 && pin) {
+              movePin(pin.scale * event.scale, event.clientX, event.clientY);
+            }
+          });
+
+          lightboxEl.addEventListener("gestureend", function (event) {
+            event.preventDefault();
+            if (touchCount === 0) {
+              releaseGesture();
+            }
+          });
+
+          lightboxEl.addEventListener("touchstart", function (event) {
+            touchCount = event.touches.length;
+            if (touchCount >= 2) {
+              panning = false;
+              startTouchPinch(event.touches);
+            } else if (touchCount === 1 && zoomScale > 1 && !event.target.closest("button")) {
+              startPan(event.touches[0].clientX, event.touches[0].clientY);
+            }
+          }, { passive: true });
+
+          lightboxEl.addEventListener("touchmove", function (event) {
+            if (event.touches.length >= 2 && touchPinch) {
+              event.preventDefault();
+              var mid = touchMid(event.touches);
+              movePin(pin.scale * touchGap(event.touches) / touchPinch.gap, mid.x, mid.y);
+            } else if (event.touches.length === 1 && pin) {
+              event.preventDefault();
+              movePin(pin.scale, event.touches[0].clientX, event.touches[0].clientY);
+            } else if (panning && event.touches.length === 1) {
+              event.preventDefault();
+              movePan(event.touches[0].clientX, event.touches[0].clientY);
+            }
+          }, { passive: false });
+
+          /* Fingers lifting mid-pinch re-pin under the ones left, so nothing jumps; the
+             last one lifting springs the image back. */
+          function endTouch(event) {
+            touchCount = event.touches.length;
+            if (pin) {
+              if (touchCount >= 2) {
+                startTouchPinch(event.touches);
+              } else if (touchCount === 1) {
+                touchPinch = null;
+                pinAt(event.touches[0].clientX, event.touches[0].clientY);
+              } else {
+                releaseGesture();
+              }
+              return;
+            }
+            if (touchCount === 0) {
+              panning = false;
+            }
+          }
+
+          lightboxEl.addEventListener("touchend", endTouch, { passive: true });
+          lightboxEl.addEventListener("touchcancel", endTouch, { passive: true });
+
+          lightboxImageEl.addEventListener("mousedown", function (event) {
+            if (event.button !== 0 || zoomScale <= 1) {
+              return;
+            }
+            event.preventDefault();
+            mouseDragged = false;
+            startPan(event.clientX, event.clientY);
+            lightboxImageEl.classList.add("is-dragging");
+          });
+
+          window.addEventListener("mousemove", function (event) {
+            if (!panning || touchCount) {
+              return;
+            }
+            mouseDragged = true;
+            movePan(event.clientX, event.clientY);
+          });
+
+          window.addEventListener("mouseup", function () {
+            if (touchCount) {
+              return;
+            }
+            panning = false;
+            lightboxImageEl.classList.remove("is-dragging");
+          });
+
+          /* A drag released over the backdrop would otherwise count as a click on it and
+             close the preview. */
+          lightboxEl.addEventListener("click", function (event) {
+            if (mouseDragged) {
+              mouseDragged = false;
+              event.stopImmediatePropagation();
+            }
+          }, true);
+
+          lightboxImageEl.addEventListener("dblclick", function (event) {
+            if (zoomScale > 1) {
+              resetZoom();
+            } else {
+              zoomAt(2.5, event.clientX, event.clientY, false);
+            }
+          });
         }
 
         function updateLightboxNav() {
@@ -782,6 +1432,10 @@
             return;
           }
 
+          if (lightboxCarousel) {
+            lightboxCarousel.finish();
+          }
+          resetZoom();
           if (lightboxOpenFrame) {
             window.cancelAnimationFrame(lightboxOpenFrame);
             lightboxOpenFrame = 0;
@@ -1024,6 +1678,9 @@
           }
 
           closeLightbox();
+          if (galleryCarousel) {
+            galleryCarousel.finish();
+          }
           overlay.classList.remove("project-overlay--lightbox-open");
           overlay.classList.remove("project-overlay--scrolling");
           document.body.classList.remove("project-overlay-open");
@@ -1052,7 +1709,44 @@
           });
         });
 
+        var galleryCarousel = null;
+        var lightboxCarousel = null;
+
+        function slideGallery(delta) {
+          if (galleryCarousel) {
+            galleryCarousel.step(delta);
+          } else {
+            stepGallery(delta);
+          }
+        }
+
+        function slideLightbox(delta) {
+          if (!isLightboxOpen) {
+            return;
+          }
+          if (lightboxCarousel) {
+            lightboxCarousel.step(delta);
+          } else {
+            stepLightbox(delta);
+          }
+        }
+
         if (lightboxImageEl) {
+          /* While enlarged, one finger pans the image instead of dragging the carousel. */
+          lightboxCarousel = createCarousel(lightboxImageEl, {
+            neighbour: neighbourSource,
+            commit: stepLightbox,
+            enabled: function () {
+              return isLightboxOpen && zoomScale === 1;
+            }
+          });
+          lightboxCarousel.attach(lightboxImageEl);
+          if (lightboxEl) {
+            bindLightboxZoom();
+          }
+          if (lightboxControlsEl) {
+            lightboxCarousel.attach(lightboxControlsEl);
+          }
           lightboxImageEl.addEventListener("load", syncLightboxRatio);
         }
 
@@ -1063,18 +1757,27 @@
         if (galleryPrevBtn) {
           galleryPrevBtn.addEventListener("click", function (event) {
             event.stopPropagation();
-            stepGallery(-1);
+            slideGallery(-1);
           });
         }
 
         if (galleryNextBtn) {
           galleryNextBtn.addEventListener("click", function (event) {
             event.stopPropagation();
-            stepGallery(1);
+            slideGallery(1);
           });
         }
 
         if (galleryImageEl) {
+          galleryCarousel = createCarousel(galleryImageEl, {
+            neighbour: neighbourSource,
+            commit: stepGallery,
+            enabled: function () {
+              return !isLightboxOpen;
+            }
+          });
+          galleryCarousel.attach(galleryImageEl);
+
           galleryImageEl.addEventListener("click", function () {
             if (!galleryImageEl.classList.contains("is-clickable")) {
               return;
@@ -1103,14 +1806,14 @@
         if (lightboxPrevBtn) {
           lightboxPrevBtn.addEventListener("click", function (event) {
             event.stopPropagation();
-            stepLightbox(-1);
+            slideLightbox(-1);
           });
         }
 
         if (lightboxNextBtn) {
           lightboxNextBtn.addEventListener("click", function (event) {
             event.stopPropagation();
-            stepLightbox(1);
+            slideLightbox(1);
           });
         }
 
@@ -1135,9 +1838,9 @@
           if (isOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
             event.preventDefault();
             if (isLightboxOpen) {
-              stepLightbox(event.key === "ArrowLeft" ? -1 : 1);
+              slideLightbox(event.key === "ArrowLeft" ? -1 : 1);
             } else {
-              stepGallery(event.key === "ArrowLeft" ? -1 : 1);
+              slideGallery(event.key === "ArrowLeft" ? -1 : 1);
             }
             return;
           }
