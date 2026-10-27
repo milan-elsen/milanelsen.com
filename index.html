@@ -89,6 +89,8 @@
       <img class="intro-portrait" src="assets/img/portrait.jpg" alt="Portrait of Milan Elsen">
       <div class="intro-name">
         <h1 id="home-title" class="display-title">MI<span class="title-kern-fix">L</span>AN ELSEN</h1>
+        <!-- Phones only: name-led teaser in place of the heading above (which stays for screen readers). -->
+        <p class="intro-teaser" aria-hidden="true"><span class="intro-teaser-name">Milan Elsen</span> is a multidisciplinary designer of interactive experiences at KISD and PolyU Hong Kong. His work focuses on interaction design for exhibitions and the cultural&nbsp;sector.</p>
         <p class="intro-subhead">Designer of <br class="intro-subhead-break">interactive experiences</p>
       </div>
       <div class="intro-bio">
@@ -104,7 +106,13 @@
         <p>Selected work in interaction, speculative, and exhibition design.</p>
       </div>
       
-      <div class="project-grid">
+      <div class="project-grid is-collapsed">
+        <!-- Card titles: Quantum Abacus has its green wordmark as a separate layer
+             (frames/quantum-abacus/quantum-abacus-title.png) over its frames, so the frames can be exported
+             without text; the other cards still have the title baked into their frames. To convert one, export <project>-title.png plus
+             text-free frames from the PSD and add after its .project-gif-frames:
+             <img class="project-title-overlay" src="assets/gifs/frames/<project>/<project>-title.png" alt="">
+             No CSS changes needed (see .project-title-overlay in site.css). -->
         <div
           class="project-card reveal"
           data-project-id="control-performance-trust-installation"
@@ -142,13 +150,16 @@
           data-project-id="quantum-abacus"
         >
           <div class="project-media project-link" aria-hidden="true">
-            <div class="project-gif-frames" data-frame-count="5">
+            <div class="project-gif-frames" data-frame-count="7">
               <img class="project-gif" data-frame="1" src="assets/gifs/frames/quantum-abacus/frame-01.webp" alt="Preview of Quantum Abacus">
               <img data-frame="2" src="assets/gifs/frames/quantum-abacus/frame-02.webp" alt="">
               <img data-frame="3" src="assets/gifs/frames/quantum-abacus/frame-03.webp" alt="">
               <img data-frame="4" src="assets/gifs/frames/quantum-abacus/frame-04.webp" alt="">
               <img data-frame="5" src="assets/gifs/frames/quantum-abacus/frame-05.webp" alt="">
+              <img data-frame="6" src="assets/gifs/frames/quantum-abacus/frame-06.webp" alt="">
+              <img data-frame="7" src="assets/gifs/frames/quantum-abacus/frame-07.webp" alt="">
             </div>
+            <img class="project-title-overlay" src="assets/gifs/frames/quantum-abacus/quantum-abacus-title.png" alt="">
           </div>
           <p class="project-meta">Interaction Design, Science Communication</p>
           <p>Interactive Exhibit, Concept + Prototype</p>
@@ -263,6 +274,8 @@
           <p>iOS App prototype</p>
         </div>
       </div>
+      <!-- Phones only: the grid starts with four cards; this toggles the rest. -->
+      <button class="project-grid-more" type="button" aria-controls="projects">Show more</button>
     </section>
 
     <p class="intro-copy intro-copy--small footer-notice footer-notice--mobile">© 2026 Milan Elsen</p>
@@ -814,11 +827,34 @@
         });
       }
 
+      /* Phones show only the first four cards (see .project-grid.is-collapsed in site.css);
+         the button toggles the rest. Collapsing shortens the page above the button, so the
+         page scrolls by the same amount to keep the button where it was on screen. */
+      function setupProjectGridMore() {
+        var grid = document.querySelector(".project-grid");
+        var button = document.querySelector(".project-grid-more");
+        if (!grid || !button) {
+          return;
+        }
+        button.setAttribute("aria-expanded", "false");
+        button.addEventListener("click", function () {
+          var collapsing = !grid.classList.contains("is-collapsed");
+          var topBefore = button.getBoundingClientRect().top;
+          grid.classList.toggle("is-collapsed", collapsing);
+          button.textContent = collapsing ? "Show more" : "Show less";
+          button.setAttribute("aria-expanded", collapsing ? "false" : "true");
+          if (collapsing) {
+            window.scrollBy(0, button.getBoundingClientRect().top - topBefore);
+          }
+        });
+      }
+
       window.addEventListener("resize", handleResize);
       setupProjectGifs();
       pinBurgerToViewport();
       pinSideRailToViewport();
       setupMobileMenu();
+      setupProjectGridMore();
       alignRailEmail();
       syncMediaWidths();
       syncTextWidth(document.getElementById("home-title"));

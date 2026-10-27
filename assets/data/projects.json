@@ -89,7 +89,7 @@
     "title": "Quantum Abacus",
     "meta": "Interaction Design, Science Communication",
     "summary": "Quantum Abacus is a kinetic installation that translates superposition and probabilistic measurement into a physical, abacus-inspired exhibit. It was developed in a competition for the Institute of AI Saftey of the German Aerospace Center (DLR) in Collaboration with Parsons School of Design in New York. The project demonstrates a novel approach to science communication by allowing visitors to interact with quantum concepts directly. Instead of explaining quantum principles through abstraction alone, the project lets visitors manipulate probabilities and directly experience in real time how a calculation can be made, with the otherwise un-imaginable quantum mechanics. The project tested the boundaries of what is possible with typical science-communication approaches, as the principles of quantum computing are utterly incompatible with metaphors in the atomic scale world. As the winners of the competition, Cora Kindermann and me were employed by the DLR.",
-    "context": "Winner of a Competition among collaborative, international teams to design an illustrative Science-communication exhibit of the DLR Institute of AI Safetyx^^^",
+    "context": "Winner of a Competition among collaborative, international teams to design an illustrative Science-communication exhibit of the DLR Institute of AI Safety",
     "approach": "Illustrative Exhibit,\nIterative Prototyping,\nIterative User Testing",
     "outcome": "Concept and prototype developed with partners at Parsons and DLR.",
     "time": "November 2024 (6 weeks)",
@@ -105,19 +105,39 @@
     "skills": "Physical Computing\nLaser Cutting,\n3D Printing,\nRemote Collaboration,\nInterface Design",
     "gallery": [
       {
-        "src": "assets/img/quantum-abacus/abacus-01.jpg",
+        "src": "assets/img/quantum-abacus/quantum-abacus-01.jpg",
         "subtitle": ""
       },
       {
-        "src": "assets/img/quantum-abacus/abacus-02.jpg",
+        "src": "assets/img/quantum-abacus/quantum-abacus-02.jpg",
         "subtitle": ""
       },
       {
-        "src": "assets/img/quantum-abacus/abacus-03.jpg",
+        "src": "assets/img/quantum-abacus/quantum-abacus-03.jpg",
         "subtitle": ""
       },
       {
-        "src": "assets/img/quantum-abacus/abacus-04.jpg",
+        "src": "assets/img/quantum-abacus/quantum-abacus-04.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/quantum-abacus-05.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/quantum-abacus-06.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/quantum-abacus-07.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/quantum-abacus-08.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/quantum-abacus/quantum-abacus-09.jpg",
         "subtitle": ""
       }
     ],

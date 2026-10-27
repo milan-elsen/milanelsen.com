@@ -3,5 +3,7 @@
   { "file": "frame-02.webp", "durationMs": 300, "opaque": false },
   { "file": "frame-03.webp", "durationMs": 300, "opaque": false },
   { "file": "frame-04.webp", "durationMs": 300, "opaque": false },
-  { "file": "frame-05.webp", "durationMs": 300, "opaque": false }
+  { "file": "frame-05.webp", "durationMs": 300, "opaque": false },
+  { "file": "frame-06.webp", "durationMs": 300, "opaque": false },
+  { "file": "frame-07.webp", "durationMs": 300, "opaque": false }
 ]

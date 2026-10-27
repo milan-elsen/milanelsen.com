@@ -717,6 +717,29 @@
           overlay.classList.toggle("project-overlay--scrolling", !!needsScroll);
         }
 
+        /* On phones the gallery box takes the first image's aspect ratio at full text width
+           (see .project-overlay-gallery-frame in site.css), so every image after it fits
+           into the same box. The token drops a late load from a previously opened project. */
+        var galleryRatioToken = 0;
+        function syncGalleryRatio() {
+          if (!galleryPanelEl) {
+            return;
+          }
+          var token = ++galleryRatioToken;
+          galleryPanelEl.style.removeProperty("--gallery-ratio");
+          var src = galleryItems.length ? pickImageSource(galleryItems[0]) : "";
+          if (!src) {
+            return;
+          }
+          var probe = new Image();
+          probe.onload = function () {
+            if (token === galleryRatioToken && probe.naturalWidth > 0 && probe.naturalHeight > 0) {
+              galleryPanelEl.style.setProperty("--gallery-ratio", String(probe.naturalWidth / probe.naturalHeight));
+            }
+          };
+          probe.src = src;
+        }
+
         /* The CSS sizes the image from its aspect ratio so it fills the free space, larger
            or smaller than its own pixels. */
         function syncLightboxRatio() {
@@ -1668,6 +1691,7 @@
           var showRealGallery = hasRealGalleryItems(galleryItems);
           setGalleryMode(showRealGallery);
           renderGallery();
+          syncGalleryRatio();
           if (linksEl) {
             var renderedLinks = renderProjectLinks(payload.links);
             linksEl.innerHTML = renderedLinks;
