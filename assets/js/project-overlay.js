@@ -683,10 +683,22 @@
           renderGallery();
         }
 
+        /* The overlay sits in the page (see .project-overlay in site.css), so it has to be
+           placed over whatever part of the page is currently in view. */
+        function syncOverlayViewport() {
+          if (!overlay) {
+            return;
+          }
+          overlay.style.setProperty("--overlay-scroll-y", (window.scrollY || window.pageYOffset || 0) + "px");
+          overlay.style.setProperty("--overlay-viewport-h", window.innerHeight + "px");
+        }
+
         function updateOverlayLayoutMode() {
           if (!overlay || !overlay.classList) {
             return;
           }
+
+          syncOverlayViewport();
 
           if (!isOpen) {
             overlay.classList.remove("project-overlay--scrolling");
@@ -699,7 +711,9 @@
             return;
           }
 
-          var needsScroll = shell.scrollHeight > overlay.clientHeight - 2;
+          // The overlay bleeds past the viewport top and bottom; only the visible part counts.
+          var bleed = parseFloat(window.getComputedStyle(overlay).getPropertyValue("--overlay-bleed")) || 0;
+          var needsScroll = shell.scrollHeight > overlay.clientHeight - 2 * bleed - 2;
           overlay.classList.toggle("project-overlay--scrolling", !!needsScroll);
         }
 
@@ -1660,6 +1674,7 @@
             linksEl.hidden = !renderedLinks;
           }
 
+          syncOverlayViewport();
           mount.hidden = false;
           requestAnimationFrame(function () {
             document.body.classList.add("project-overlay-open");

@@ -1,4 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
+/* One variable file for upright and italic: font-style: italic falls back to oblique, which
+   the browser draws from the slnt axis (CSS oblique 14deg = slnt -14) rather than skewing. */
+@font-face {
+  font-family: "Aix Antiqua";
+  font-style: oblique -30deg 30deg;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("../fonts/aix-antiqua/AixAntiqua-Variable.woff") format("woff");
+}
 
 @font-face {
   font-family: "Nimbus Sans Narrow";
@@ -48,9 +56,16 @@
   --space-5: 3.8rem;
   --space-6: 6.2rem;
   --display-font: "HelveticaNeue-CondensedBold", "Helvetica Neue Condensed Bold", "HelveticaNeue-Condensed", "Helvetica Neue Condensed", "Nimbus Sans Narrow", "Inter Tight", sans-serif;
-  --accent-serif: "Instrument Serif", "Times New Roman", serif;
-  --body-font: "Instrument Serif", "Times New Roman", serif;
+  --accent-serif: "Aix Antiqua", "Times New Roman", serif;
+  --body-font: "Aix Antiqua", "Times New Roman", serif;
+  /* Tracking for Aix Antiqua text, on top of the font's own kerning. */
+  --serif-tracking: 0.01em;
   --body-copy-size: 1.1667rem;
+  /* The header wordmark; the side rail email matches it. */
+  --brand-size: clamp(1.25rem, 2vw, 2.1rem);
+  /* Optically matched: green and set vertically, the email reads smaller than the black
+     wordmark at the same size, so it is set slightly larger. */
+  --rail-email-size: calc(var(--brand-size) * 1.08);
   --statement-font: "HelveticaNeue-CondensedBold", "Helvetica Neue Condensed Bold", "HelveticaNeue-Condensed", "Helvetica Neue Condensed", "Nimbus Sans Narrow", "Inter Tight", sans-serif;
 }
 
@@ -204,6 +219,7 @@ body {
   background: #fff;
   color: var(--ink);
   font-family: var(--body-font);
+  letter-spacing: var(--serif-tracking);
   line-height: 1.45;
   min-height: 100vh;
 }
@@ -336,7 +352,7 @@ video {
 .brand {
   font-family: var(--display-font);
   font-weight: 700;
-  font-size: clamp(1.25rem, 2vw, 2.1rem);
+  font-size: var(--brand-size);
   text-transform: none;
   letter-spacing: 0.015em;
   text-decoration: none;
@@ -1024,10 +1040,10 @@ body.header--menu-open {
     transform-origin: center;
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 1.65rem;
+    font-size: var(--rail-email-size);
     font-weight: 900;
     letter-spacing: 0.012em;
-    text-transform: uppercase;
+    text-transform: none;
     color: var(--ink);
     text-align: center;
     pointer-events: auto;
@@ -1165,10 +1181,10 @@ body.header--menu-open {
     transform-origin: center;
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 1.65rem;
+    font-size: var(--rail-email-size);
     font-weight: 900;
     letter-spacing: 0.012em;
-    text-transform: uppercase;
+    text-transform: none;
     color: var(--ink);
     text-align: center;
     pointer-events: auto;
@@ -1623,10 +1639,10 @@ body.header--menu-open {
     transform-origin: center;
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 1.65rem;
+    font-size: var(--rail-email-size);
     font-weight: 900;
     letter-spacing: 0.012em;
-    text-transform: uppercase;
+    text-transform: none;
     color: var(--ink);
     text-align: center;
     pointer-events: auto;
@@ -2212,10 +2228,10 @@ body.header--menu-open {
     transform-origin: center;
     text-decoration: none;
     font-family: var(--display-font);
-    font-size: 1.65rem;
+    font-size: var(--rail-email-size);
     font-weight: 900;
     letter-spacing: 0.012em;
-    text-transform: uppercase;
+    text-transform: none;
     color: var(--ink);
     text-align: center;
     pointer-events: auto;
@@ -2626,21 +2642,35 @@ body.header--menu-open {
 }
 
 .project-overlay-root {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
   z-index: 20000;
   pointer-events: none;
 }
 
+/* Positioned in the page at the current scroll offset rather than fixed: iOS Safari paints
+   its status bar and address bar over fixed elements with a flat colour, but lets ordinary
+   page content (and so this blur) show through. It bleeds past the top and bottom of the
+   viewport to fill those bars; the padding takes the bleed back. The project-overlay.js
+   sets --overlay-scroll-y and --overlay-viewport-h on open and resize. */
 .project-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  --overlay-bleed: 160px;
+  --overlay-pad: clamp(0.8rem, 1.8vw, 1.5rem);
+  top: calc(var(--overlay-scroll-y, 0px) - var(--overlay-bleed));
+  left: 0;
+  width: 100%;
+  height: calc(var(--overlay-viewport-h, 100vh) + 2 * var(--overlay-bleed));
+  box-sizing: border-box;
   --overlay-close-size: clamp(2.2rem, 3.2vw, 2.8rem);
   --overlay-notch-size: calc(var(--overlay-close-size) + clamp(0.28rem, 0.45vw, 0.45rem));
   --overlay-notch-size-effective: var(--overlay-notch-size);
   --overlay-outer-radius: clamp(0.7rem, 1.4vw, 1.15rem);
   --overlay-inner-radius: clamp(0.45rem, 1vw, 0.85rem);
-  padding: clamp(0.8rem, 1.8vw, 1.5rem);
+  padding: calc(var(--overlay-pad) + var(--overlay-bleed)) var(--overlay-pad);
   display: grid;
   align-items: center;
   justify-items: center;
@@ -2845,7 +2875,7 @@ body.header--menu-open {
   font-family: var(--body-font);
   font-size: var(--body-copy-size);
   font-style: italic;
-  letter-spacing: 0;
+  letter-spacing: var(--serif-tracking);
   line-height: 1.35;
   white-space: normal;
 }
@@ -2880,8 +2910,9 @@ body.header--menu-open {
   margin-right: 0.22rem;
 }
 
+/* Steeper than plain italic (oblique 14deg); Aix Antiqua draws it from its slant axis. */
 .project-overlay-meta-label {
-  font-style: italic;
+  font-style: oblique 25deg;
 }
 
 .project-overlay-detail-grid {
@@ -3101,7 +3132,7 @@ body.header--menu-open {
   font-style: italic;
   font-weight: 400;
   line-height: 1.35;
-  letter-spacing: 0;
+  letter-spacing: var(--serif-tracking);
   text-align: center;
   white-space: pre-line;
 }
@@ -3236,7 +3267,7 @@ body.header--menu-open {
   font-style: italic;
   font-weight: 400;
   line-height: 1.35;
-  letter-spacing: 0;
+  letter-spacing: var(--serif-tracking);
   text-align: center;
   white-space: pre-line;
   color: #000;
@@ -3301,25 +3332,31 @@ body.header--menu-open {
 
 .project-overlay-lightbox-stage > .project-overlay-close {
   position: fixed;
-  top: clamp(0.75rem, 2vw, 1rem);
-  right: clamp(0.75rem, 2vw, 1rem);
+  top: var(--lightbox-edge);
+  right: var(--lightbox-edge);
   left: auto;
   transform: none;
 }
 
 @media (max-width: 980px) {
   .project-overlay-lightbox-stage > .project-overlay-close {
-    top: clamp(0.75rem, 2vw, 1rem);
-    right: clamp(0.75rem, 2vw, 1rem);
+    top: var(--lightbox-edge);
+    right: var(--lightbox-edge);
   }
 }
 
-/* Lightbox layout: full-screen rows. The equal 1fr tracks keep the image centred and put
-   the arrows in the middle of the white space beneath it. The stage lets taps through so
+/* Lightbox layout: full-screen rows. The outer tracks share the spare height equally, which
+   keeps a smaller image centred with the arrows in the middle of the white space beneath
+   it; when space is tight they shrink to their minimums (level with the top of the close
+   button above, the arrows' height below) and the image takes the rest. The stage lets taps through so
    the backdrop still closes the preview. */
 .project-overlay-lightbox-stage {
+  /* The close button's inset from the corner; the image may rise to its top edge. */
+  --lightbox-edge: clamp(0.75rem, 2vw, 1rem);
+  --lightbox-top-min: var(--lightbox-edge);
+  --lightbox-arrows-h: 189px;
   display: grid;
-  grid-template-rows: 1fr auto auto 1fr;
+  grid-template-rows: minmax(var(--lightbox-top-min), 1fr) auto auto minmax(var(--lightbox-arrows-h), 1fr);
   row-gap: 0;
   justify-items: center;
   width: 100%;
@@ -3329,14 +3366,20 @@ body.header--menu-open {
   pointer-events: none;
 }
 
+/* A single image hides the arrows, so the image takes their space too, with the same inset
+   below as above; the equal outer tracks then centre it vertically. */
+.project-overlay-lightbox-stage:has(> .project-overlay-lightbox-controls[hidden]) {
+  --lightbox-arrows-h: var(--lightbox-edge);
+}
+
 .project-overlay-lightbox-stage > * {
   pointer-events: auto;
 }
 
-/* Leave room for the arrows below the image, and the same again above it. */
+/* Everything except the close button's inset above and the arrows below. */
 .project-overlay-lightbox-image {
   grid-row: 2;
-  --lightbox-max-h: calc(100dvh - 28rem);
+  --lightbox-max-h: calc(100dvh - var(--lightbox-top-min) - var(--lightbox-arrows-h));
 }
 
 /* Row gaps would push the arrows off-centre, so the caption carries its own spacing. */
@@ -3518,6 +3561,9 @@ body.home-page.project-overlay-open > :not(.project-overlay-root) {
 .project-overlay.project-overlay--scrolling {
   align-items: start;
   justify-items: center;
+  /* Let the row grow with the shell so the bottom padding (and bleed) counts toward the
+     scroll height instead of the shell overflowing a viewport-high row. */
+  grid-template-rows: max-content;
 }
 
 .project-overlay.project-overlay--lightbox-open {
