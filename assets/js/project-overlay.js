@@ -743,16 +743,54 @@
         /* The CSS sizes the image from its aspect ratio so it fills the free space, larger
            or smaller than its own pixels. */
         function syncLightboxRatio() {
-          if (lightboxImageEl.naturalWidth > 0 && lightboxImageEl.naturalHeight > 0) {
+          if (lightboxImageEl.complete && lightboxImageEl.naturalWidth > 0 && lightboxImageEl.naturalHeight > 0) {
             lightboxImageEl.style.setProperty("--lightbox-ratio", String(lightboxImageEl.naturalWidth / lightboxImageEl.naturalHeight));
           }
+        }
+
+        /* A new src keeps the old picture's dimensions until it loads, so the ratio comes
+           from a copy that is already loaded, when there is one. */
+        function loadedRatio(src) {
+          var loaded = decodedImages[src];
+          if (!loaded && galleryImageEl && galleryImageEl.getAttribute("src") === src) {
+            loaded = galleryImageEl;
+          }
+          return loaded && loaded.complete && loaded.naturalWidth > 0 ? loaded.naturalWidth / loaded.naturalHeight : 0;
+        }
+
+        /* The box the lightbox image would have at `ratio`, measured on the image itself so
+           it can't drift from the CSS. Set and restored before anything paints. */
+        function lightboxIncomingBox(ratio) {
+          var current = lightboxImageEl.style.getPropertyValue("--lightbox-ratio");
+          lightboxImageEl.style.setProperty("--lightbox-ratio", String(ratio));
+          var width = parseFloat(window.getComputedStyle(lightboxImageEl).width);
+          /* height: auto would still follow the picture currently in the image. */
+          lightboxImageEl.style.height = width / ratio + "px";
+          var box = {
+            left: lightboxImageEl.offsetLeft,
+            top: lightboxImageEl.offsetTop,
+            width: width,
+            height: width / ratio
+          };
+          lightboxImageEl.style.removeProperty("height");
+          if (current) {
+            lightboxImageEl.style.setProperty("--lightbox-ratio", current);
+          } else {
+            lightboxImageEl.style.removeProperty("--lightbox-ratio");
+          }
+          return box;
         }
 
         function setLightboxContent(src, alt, subtitle) {
           resetZoom();
           lightboxImageEl.setAttribute("src", src);
           lightboxImageEl.setAttribute("alt", alt || "");
-          syncLightboxRatio();
+          var ratio = loadedRatio(src);
+          if (ratio) {
+            lightboxImageEl.style.setProperty("--lightbox-ratio", String(ratio));
+          } else {
+            syncLightboxRatio();
+          }
           if (lightboxCaptionEl) {
             var text = String(subtitle || "").trim();
             lightboxCaptionEl.textContent = text;
@@ -941,18 +979,36 @@
             peek.src = src;
             imgEl.parentNode.appendChild(peek);
             peekDelta = delta;
+            placeIncoming(peek);
             sizePeek(peek, delta);
             return peek;
+          }
+
+          /* The lightbox's counterpart to incomingHeight: its image shrinks to the picture,
+             so the peek needs the whole box of the picture it shows, not the current one's. */
+          function placeIncoming(image) {
+            if (!options.incomingBox || !image.naturalWidth) {
+              return;
+            }
+            var box = options.incomingBox(image.naturalWidth / image.naturalHeight);
+            image.style.left = box.left + "px";
+            image.style.top = box.top + "px";
+            image.style.width = box.width + "px";
+            image.style.height = box.height + "px";
           }
 
           /* Gives the peek the box the picture will have once it is the current one (see
              options.incomingHeight), so nothing resizes when it lands. */
           function sizePeek(image, delta) {
-            if (!options.incomingHeight) {
+            if (!options.incomingHeight && !options.incomingBox) {
               return;
             }
             whenDecoded(image, 1500).then(function () {
               if (image !== peek || !image.naturalWidth) {
+                return;
+              }
+              placeIncoming(image);
+              if (!options.incomingHeight) {
                 return;
               }
               var height = options.incomingHeight(delta, image.naturalWidth / image.naturalHeight);
@@ -1086,6 +1142,7 @@
             whenDecoded(incoming, 250).then(function () {
               if (!started) {
                 started = true;
+                placeIncoming(incoming);
                 if (options.incomingHeight && incoming.naturalWidth) {
                   var height = options.incomingHeight(delta, incoming.naturalWidth / incoming.naturalHeight);
                   if (height) {
@@ -1875,7 +1932,8 @@
             commit: stepLightbox,
             enabled: function () {
               return isLightboxOpen && zoomScale === 1;
-            }
+            },
+            incomingBox: lightboxIncomingBox
           });
           lightboxCarousel.attach(lightboxImageEl);
           if (lightboxEl) {

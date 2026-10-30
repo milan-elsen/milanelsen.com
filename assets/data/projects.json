@@ -285,6 +285,52 @@
     "year": "2025",
     "supervisingProfessor": "Fourth Semester\nSupervised by: Patricia Hepp"
   },
+  "tidal-exposures": {
+    "title": "Tidal Exposures",
+    "meta": "Photographic Experiments",
+    "summary": "Tidal Exposures is a series of analogue photographs developed in an experimental, home-made seaweed developer. Its scratches, stripes and softness would traditionally count as errors, but give the photos their characteristic look. Made during a workshop at the “Update” Media Art Festival in Liepāja, Latvia, in September 2025, which in that year had the theme of Baltic ecology under the title of “Blue Shift”.",
+    "context":  "Workshop at the “Update” Media Art Festival 2025.",
+    "approach": "Ecological Alternative Materials\nLocal Ecologies\nFast paced outdoor Shooting Sessions",
+    "outcome": "Photographic experiments, about five rolls of film shot. Small exhibition at RTU Liepāja’s MPLab, staged as a red-lit darkroom.",
+    "time": "Sep 2025",
+    "semester": "Independent",
+    "result": "Analogue Photographs\nDarkroom Prints\nExhibition at RTU Liepāja MPLab",
+    "team": "Solo Work\nWorkshop led by Arūnė Baronaitė",
+    "tools": "Canon AE-1\nIlford & AGFA BW Film\nSeaweed-Based Film Developer\nDarkroom Wet Process",
+    "skills": "Analogue Photography\nWet Process\nExperimental Process\nExhibition Setup",
+    "gallery": [
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-01.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-02.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-03.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-04.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-05.jpg",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-06.webp",
+        "subtitle": ""
+      },
+      {
+        "src": "assets/img/tidal-exposures/tidal-exposures-07.jpg",
+        "subtitle": ""
+      }
+    ],
+    "year": "2025",
+    "supervisingProfessor": ""
+  },
   "happy-new-music-visuals": {
     "title": "Happy New Music Visuals",
     "meta": "Visual Music, Performance, Stage Design",
