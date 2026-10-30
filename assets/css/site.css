@@ -61,11 +61,11 @@
   /* Tracking for Aix Antiqua text, on top of the font's own kerning. */
   --serif-tracking: 0.01em;
   --body-copy-size: 1.1667rem;
-  /* The header wordmark; the side rail email matches it. */
+  /* The header wordmark, which scales with the window. */
   --brand-size: clamp(1.25rem, 2vw, 2.1rem);
-  /* Optically matched: green and set vertically, the email reads smaller than the black
-     wordmark at the same size, so it is set slightly larger. */
-  --rail-email-size: calc(var(--brand-size) * 1.08);
+  /* The side rail email stays one size at every window width: about what the wordmark
+     (×1.08 to match it optically) comes to in a 1440px-wide window. */
+  --rail-email-size: 1.9rem;
   --statement-font: "HelveticaNeue-CondensedBold", "Helvetica Neue Condensed Bold", "HelveticaNeue-Condensed", "Helvetica Neue Condensed", "Nimbus Sans Narrow", "Inter Tight", sans-serif;
 }
 
@@ -1800,12 +1800,66 @@ body.header--menu-open {
     left: 50%;
   }
 
+  /* Side by side with the bio, the project column gets a vertical divider too, in the same
+     line as the one above the project list, meeting it in a corner. */
   .home-page #projects {
     width: auto;
     margin-left: clamp(0.8rem, 2vw, 2rem);
     margin-right: clamp(0.8rem, 2vw, 2rem);
     max-width: none;
     padding-top: 0;
+    border-left: 1px solid var(--rule-hard);
+    position: relative;
+  }
+
+  /* "Projects" sits a line above the cards, centred over them, out of the flow so the
+     cards start level with the portrait. */
+  .home-page #projects > .section-head {
+    position: absolute;
+    bottom: calc(100% + 1.7rem);
+    left: 0;
+    right: 0;
+    padding: 0 0 0.45rem;
+    justify-content: center;
+  }
+
+  .home-page #projects > .section-head p {
+    width: auto;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .home-page #projects > .project-grid {
+    margin-top: 0;
+  }
+
+  /* The vertical divider runs down to the bottom of the page, drawn as a line on the
+     section instead of a border. It gets there with copies of itself as box shadows
+     (each shifted less than the line is long, so they join up): shadows never count
+     towards the page's size, so the page doesn't get longer. */
+  .home-page #projects {
+    border-top: 0;
+    border-left: 0;
+  }
+
+  .home-page #projects::before {
+    /* --rule-hard as it lands on the white page, solid so overlapping shadow copies
+       don't draw darker. */
+    --rule-solid: #73a099;
+    content: "";
+    position: absolute;
+    left: 0;
+    background: var(--rule-solid);
+    pointer-events: none;
+  }
+
+  .home-page #projects::before {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    box-shadow:
+      0 400px 0 var(--rule-solid),
+      0 800px 0 var(--rule-solid);
   }
 
   .home-page #projects {
@@ -1817,6 +1871,14 @@ body.header--menu-open {
     max-width: none;
     margin-left: 0;
     margin-right: 0;
+  }
+
+  /* The cards sit in a narrower column, centred, with white space either side (at least
+     2rem); the divider and the "Projects" line above keep the full width. */
+  .home-page .project-grid {
+    width: min(691px, calc(100% - 4rem));
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .home-page .project-card,
@@ -1925,7 +1987,7 @@ body.header--menu-open {
 .footer-email {
   margin: 0;
   font-family: var(--display-font);
-  font-size: 1rem;
+  font-size: 2rem;
   letter-spacing: 0.01em;
 }
 
@@ -2741,7 +2803,7 @@ body.header--menu-open {
     text-align-last: center;
   }
 
-  /* The subhead now opens the bio, below the same divider as above "Selected work"
+  /* The subhead now opens the bio, below the same divider as above the project list
      (#projects' top border). */
   .home-page .intro-subhead {
     margin-top: 2.4rem;
@@ -3228,8 +3290,9 @@ body.header--menu-open {
   min-height: 0;
 }
 
-/* While the carousel slides, pictures are cut off at the frame's sides; above and below
-   it leaves room for the drop shadow. */
+/* While the carousel slides, pictures are cut off at the frame's sides. Gallery images
+   carry no drop shadow: the clip would cut it into hard edges mid-slide, and on images
+   with a white background it outlines the white box. */
 .project-overlay-gallery-frame.is-sliding {
   clip-path: inset(-3rem 0 -4rem 0);
 }
@@ -3284,15 +3347,22 @@ body.header--menu-open {
   object-fit: contain;
   object-position: center;
   background: transparent;
-  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.28));
   touch-action: pan-y pinch-zoom;
   /* Its own compositing layer from the start, so the first frame of a carousel drag
-     doesn't stall while one is created and the shadow repainted. */
+     doesn't stall while one is created. */
   will-change: transform;
 }
 
 .project-overlay-gallery-image.is-clickable {
   cursor: zoom-in;
+}
+
+/* With a subtitle under it, the picture gives up one caption line of the frame's height
+   (plus the 0.6rem caption margin and the 0.15rem gap) instead of relying on flex
+   shrinking, which Safari resolves differently. project-overlay.js sizes a picture sliding
+   in to the same box. */
+.project-overlay-gallery-frame:has(> .project-overlay-gallery-caption:not([hidden])) .project-overlay-gallery-image {
+  max-height: calc(100% - 1.35 * var(--body-copy-size) - 0.75rem);
 }
 
 .project-overlay-gallery-caption {
@@ -3407,7 +3477,6 @@ body.header--menu-open {
   max-height: var(--lightbox-max-h);
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.28));
   opacity: 0;
   transform: scale(0.985);
   transition: opacity 180ms ease, transform 220ms ease;
@@ -3543,6 +3612,11 @@ body.header--menu-open {
   --lightbox-arrows-h: var(--lightbox-edge);
 }
 
+/* ...but a single image with a caption keeps room for that caption below it. */
+.project-overlay-lightbox-stage:has(> .project-overlay-lightbox-controls[hidden]):has(> .project-overlay-lightbox-caption:not([hidden])) {
+  --lightbox-arrows-h: calc(var(--lightbox-edge) + 1.35 * var(--body-copy-size) + 0.5rem);
+}
+
 .project-overlay-lightbox-stage > * {
   pointer-events: auto;
 }
@@ -3550,13 +3624,20 @@ body.header--menu-open {
 /* Everything except the close button's inset above and the arrows below. */
 .project-overlay-lightbox-image {
   grid-row: 2;
+  grid-column: 1;
   --lightbox-max-h: calc(100dvh - var(--lightbox-top-min) - var(--lightbox-arrows-h));
 }
 
-/* Row gaps would push the arrows off-centre, so the caption carries its own spacing. */
+/* The caption shares the image's cell and is shifted to sit just below it, so it never
+   moves the arrows. Both are pinned to column 1: sharing a row, the grid would otherwise
+   give one of them a second column. */
 .project-overlay-lightbox-caption {
-  grid-row: 3;
-  margin-top: 0.35rem;
+  grid-row: 2;
+  grid-column: 1;
+  align-self: end;
+  justify-self: center;
+  margin: 0;
+  transform: translateY(calc(100% + 0.5rem));
 }
 
 /* The chevrons are drawn with ~1/5 of the button as padding on each side, so this gap
@@ -3824,4 +3905,385 @@ body.home-page.project-overlay-open > :not(.project-overlay-root) {
 
 .project-overlay.project-overlay--scrolling .project-overlay-shell {
   padding-bottom: clamp(1.6rem, 4vw, 3rem);
+}
+
+/* Trial: the contact sidebar on the left instead of the right. Self-contained, so deleting
+   this block restores the right-hand sidebar. The rail and its rotated email/links mirror
+   to the left edge, the grid reserves the rail's column first (rail, bio, projects), and
+   the header wordmark moves in so the rail doesn't cover it. Phones have no rail. */
+@media (min-width: 601px) {
+  .home-page .side-rail {
+    left: 0;
+    right: auto;
+    border-left: 0;
+    border-right: 0.6pt solid var(--ink);
+  }
+
+  .home-page .side-rail-inner {
+    left: calc(var(--rail-col) / 2);
+    right: auto;
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+}
+
+@media (min-width: 1025px) {
+  .home-page #content.site {
+    grid-template-columns: var(--rail-col) var(--left-col) minmax(0, 1fr);
+  }
+
+  .home-page .intro {
+    grid-column: 2;
+  }
+
+  .home-page #projects {
+    grid-column: 3;
+  }
+
+  .home-page .nav-inner.site {
+    box-sizing: border-box;
+    padding-left: calc(var(--rail-col) + var(--col-gap));
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .home-page #content.site {
+    margin-left: calc(var(--rail-col) + 1.25rem);
+    margin-right: 1.25rem;
+  }
+
+  .home-page .nav-inner.site {
+    width: calc(100% - var(--rail-col) - 2.5rem);
+    margin-left: calc(var(--rail-col) + 1.25rem);
+    margin-right: 1.25rem;
+  }
+}
+
+/* Desktop bio: the same name-led teaser as on phones, in place of the name heading (which
+   stays in the page for screen readers), set in the bio column's width. */
+@media (min-width: 1025px) {
+  .home-page .intro .display-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+  }
+
+  .home-page .intro-teaser {
+    display: block;
+    width: var(--portrait-size);
+    margin: var(--space-3) 0 0;
+    font-family: var(--statement-font);
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-align: justify;
+    text-align-last: left;
+  }
+
+  /* The name a size up from the sentence it opens. */
+  .home-page .intro-teaser-name {
+    font-size: 2.1rem;
+    text-transform: uppercase;
+  }
+}
+
+/* The wordmark in the side rail (index.html): on one line, and with all the rail's type
+   black, keeping its colour on hover like the header wordmark does. */
+.home-page .side-rail .brand,
+.home-page .side-rail .brand:hover,
+.project-page .side-rail .brand,
+.project-page .side-rail .brand:hover {
+  white-space: nowrap;
+}
+
+.home-page .side-rail .brand,
+.home-page .side-rail .side-rail-links a,
+.home-page .side-rail .side-rail-links a:hover,
+.project-page .side-rail .brand,
+.project-page .side-rail .side-rail-links a,
+.project-page .side-rail .side-rail-links a:hover {
+  color: #000;
+}
+
+/* Imprint, privacy and socials (the "project-page" pages) get the home page's sidebar
+   too: on the left, with the wordmark in it, and the content column making room for it
+   on the left instead of the right. */
+@media (min-width: 601px) {
+  .project-page .side-rail {
+    left: 0;
+    right: auto;
+    border-left: 0;
+    border-right: 0.6pt solid var(--ink);
+  }
+
+  .project-page #content.site {
+    padding-right: 0;
+    padding-left: var(--rail-col);
+  }
+}
+
+/* The same distance from the top as the home page's content (its #content.site padding),
+   so the sidebar's wordmark, which lines up with it, doesn't move between pages. */
+@media (min-width: 601px) {
+  :is(.imprint-page, .privacy-page) #content.site {
+    padding-top: 4rem;
+  }
+}
+
+/* The project cards' subtitles (disciplines and project type) in black. */
+.home-page .project-card p {
+  color: #000;
+}
+
+/* The side rail's contents sit in one window-high box: in the fixed rail it simply fills
+   the rail, in the green frame it stays pinned while the rail scrolls with the page. */
+.side-rail-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+/* Inverted frame on desktop, switched on by the "frame-inverted" class on <body> in
+   index.html: remove that class (or this block) to go back to the white page.
+   Everything around the project section -- the header band and the bio column -- is
+   green with white type; the project section stays white out to the window's right edge
+   and the page bottom (white box-shadow copies of the section, which, unlike a wider box,
+   never make the page scroll). The side rail stays white. */
+@media (min-width: 1025px) {
+  body.home-page.frame-inverted::before {
+    background: var(--ink);
+  }
+
+  .frame-inverted.home-page #content,
+  .frame-inverted.home-page .nav {
+    background: transparent;
+  }
+
+  .frame-inverted.home-page .nav .brand,
+  .frame-inverted.home-page .intro,
+  .frame-inverted.home-page .intro .display-title,
+  .frame-inverted.home-page .intro-teaser,
+  .frame-inverted.home-page .intro-subhead,
+  .frame-inverted.home-page .intro a {
+    color: #fff;
+  }
+
+  .frame-inverted.home-page .intro a:hover,
+  .frame-inverted.home-page .intro a:focus-visible {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  /* The bio column's box stretches over the whole green column -- from the side rail's
+     edge (the grid's outer margin plus the gap) to the divider (the gap plus the project
+     section's margin) -- and its content is centred in it. */
+  .frame-inverted.home-page .intro {
+    width: auto;
+    max-width: none;
+    margin-left: calc(-1 * (var(--col-gap) + max(1.25rem, (100vw - 1500px) / 2)));
+    margin-right: calc(-1 * (var(--col-gap) + clamp(0.8rem, 2vw, 2rem)));
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .frame-inverted.home-page .intro-bio {
+    width: var(--portrait-size);
+  }
+
+  .frame-inverted.home-page .intro-portrait,
+  .frame-inverted.home-page .intro-name,
+  .frame-inverted.home-page .intro-bio {
+    justify-self: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* The page ends in a green band with the email, so there's green on the page itself
+     and not only in the overscroll. It sits above the project section's white. */
+  .frame-inverted.home-page {
+    --band-h: max(27vh, 15rem);
+  }
+
+  .frame-inverted.home-page .footer--full {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: var(--band-h);
+    margin-top: 0;
+    padding: 0;
+    border-top: 0;
+    background: var(--ink);
+  }
+
+  .frame-inverted.home-page .footer-shell {
+    display: block;
+    padding-bottom: 0; /* .site's page-bottom padding, not wanted in the band */
+    text-align: center;
+  }
+
+  /* Below the email, a small Socials button; the footer's other links stay hidden (the
+     side rail has them). */
+  .frame-inverted.home-page .footer-links {
+    justify-content: center;
+    margin-top: 1.4rem;
+  }
+
+  .frame-inverted.home-page .footer-links a:not([href^="socials"]) {
+    display: none;
+  }
+
+  .frame-inverted.home-page .footer-links a[href^="socials"] {
+    border: 1px solid #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem 0.4rem;
+    color: #fff;
+    font-size: 0.98rem;
+  }
+
+  .frame-inverted.home-page .footer-links a[href^="socials"]:hover,
+  .frame-inverted.home-page .footer-links a[href^="socials"]:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+
+  .frame-inverted.home-page .footer-email {
+    font-family: var(--display-font);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: 0.012em;
+  }
+
+  .frame-inverted.home-page .footer-email a {
+    color: #fff;
+  }
+
+  .frame-inverted.home-page .footer-email a:hover,
+  .frame-inverted.home-page .footer-email a:focus-visible {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-thickness: 0.05em;
+    text-underline-offset: 0.12em;
+  }
+
+  /* The side rail is part of the page here, from the top down to the green band, and its
+     contents stay pinned to the window (sticky) until the band arrives; then the browser
+     scrolls the rail up with the page at exactly the page's speed. The !important beat
+     the inline top/height that pinSideRailToViewport() in index.html keeps setting. */
+  .frame-inverted.home-page .side-rail {
+    position: absolute;
+    top: 0 !important;
+    bottom: var(--band-h);
+    height: auto !important;
+    overflow: clip;
+  }
+
+  .frame-inverted.home-page #projects {
+    background: #fff;
+    /* Down only 160px: enough to bridge the ~100px to the green band and end hidden
+       under it, so the white doesn't show below the page in Safari's overscroll. The
+       copies 400px up carry the white to the top of the window. */
+    box-shadow:
+      0 -400px 0 #fff, 400px -400px 0 #fff, 800px -400px 0 #fff, 1200px -400px 0 #fff, 1600px -400px 0 #fff,
+      400px 0 0 #fff, 800px 0 0 #fff, 1200px 0 0 #fff, 1600px 0 0 #fff,
+      0 160px 0 #fff, 400px 160px 0 #fff, 800px 160px 0 #fff, 1200px 160px 0 #fff, 1600px 160px 0 #fff;
+  }
+
+  .frame-inverted.home-page #projects::before {
+    box-shadow: 0 160px 0 var(--rule-solid), 0 -400px 0 var(--rule-solid);
+  }
+
+  /* Safari's overscroll: white over the rail and the project section takes both a white
+     copy of the page above its top and a fixed layer behind the page; neither shows
+     alone. The project section's copies are its box shadows above; this is the rail's,
+     hanging off the same section because the rail and header clip their overflow. The
+     box itself is transparent and sits under the rail. --projects-left is set in
+     index.html. */
+  .frame-inverted.home-page #projects::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: calc(-1 * var(--projects-left, 0px));
+    width: var(--rail-col);
+    height: 400px;
+    box-shadow: 0 -400px 0 #fff;
+    pointer-events: none;
+  }
+
+  /* Towards the page end the footer band runs full width, so the fixed layer is hidden
+     (see "is-past-middle"). */
+  body.home-page.frame-inverted::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(
+      to right,
+      #fff var(--rail-col),
+      var(--ink) var(--rail-col),
+      var(--ink) var(--projects-left, 100%),
+      #fff var(--projects-left, 100%)
+    );
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  html.is-past-middle body.home-page.frame-inverted::after {
+    display: none;
+  }
+}
+
+/* Very large windows, past the point where the page column stops growing (1500px plus its
+   margins): the page fills the window instead of sitting centred in it. The green bar grows
+   only a little, so the portrait and text don't get lost in it, and the cards centre in all
+   the white that's left, the section reaching to the window's right edge. */
+@media (min-width: 1541px) {
+  .frame-inverted.home-page {
+    --left-col: min(calc(360px + (100vw - 1540px) * 0.18), 560px);
+  }
+
+  .frame-inverted.home-page #content.site {
+    width: calc(100% - 2.5rem);
+    max-width: none;
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+  }
+
+  .frame-inverted.home-page .intro {
+    margin-left: calc(-1 * (var(--col-gap) + 1.25rem));
+  }
+
+  .frame-inverted.home-page #projects {
+    margin-right: -1.25rem;
+  }
+}
+
+/* The bio follows the name directly: a gap above it, and on phones the divider it opens
+   with, the same as above the project list. */
+@media (min-width: 601px) {
+  .home-page .intro-bio {
+    margin-top: var(--space-3);
+  }
+}
+
+/* Sized by its own text, not by the row. A percentage height here refers back to the row
+   this column helps to size, which Safari kept resolving larger on each layout (the page
+   grew every time it was scrolled to the bottom), and more so with the margin above. */
+@media (min-width: 1025px) {
+  .home-page .intro-bio {
+    min-height: 0;
+    height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-page .intro-bio {
+    margin-top: 2.4rem;
+    padding-top: 2.4rem;
+    border-top: 1px solid var(--rule-hard);
+  }
 }

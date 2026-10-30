@@ -4,7 +4,8 @@
  * The wordmark is split into three masked segments -- milan / elsen / .com -- and
  * hovering it plays one of the enabled animations in the ANIMATIONS registry below,
  * picked at random (never the same one twice in a row). Nothing new starts while a
- * run is playing.
+ * run is playing. Clicking it follows the link at once and the animation plays, or
+ * carries on, on the page it lands on.
  *
  * Turning animations on and off: flip "enabled" in ANIMATIONS. Only enabled ones
  * are picked on hover; disabled ones can still be played with the testing hooks
@@ -34,6 +35,19 @@
   "use strict";
 
   var EXPO_OUT = [0.16, 1, 0.3, 1];
+
+  /* The animations' dice, seeded per run: a run carried over to the next page rolls
+     the same numbers there, so it carries on as the same run. */
+  var random = Math.random;
+
+  function seededRandom(seed) {
+    return function () {
+      seed = (seed + 0x6d2b79f5) | 0;
+      var x = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+  }
 
   /* ---------------------------------------------------------------- helpers */
 
@@ -90,7 +104,13 @@
   /* The right edge animations align to: the project list on the home page, the
      text column on imprint and privacy, the content column elsewhere. Never past
      the contact rail -- the content column runs underneath it on some pages. */
-  function alignmentEdge(brand) {
+  function alignmentEdge(ctx) {
+    var brand = ctx.brand;
+    // Turned into the side rail, "across the page" runs up the rail, to just short of
+    // the window's top edge.
+    if (ctx.rotated) {
+      return ctx.viewW - 24;
+    }
     var target =
       document.querySelector(".project-grid") ||
       document.querySelector(".list-block-content") ||
@@ -164,7 +184,7 @@
         var range = document.createRange();
         range.setStart(text, c);
         range.setEnd(text, c + 1);
-        marks.push({ ch: text.data[c], rect: range.getBoundingClientRect() });
+        marks.push({ ch: text.data[c], rect: ctx.rect(range) });
       }
     });
 
@@ -186,13 +206,13 @@
       layer.appendChild(el);
       return el;
     });
-    document.body.appendChild(layer);
+    ctx.host().appendChild(layer);
     // Line the copies' glyphs up with the originals exactly, whatever the
     // difference in how the two boxes are measured.
     copies.forEach(function (el, n) {
       var range = document.createRange();
       range.selectNodeContents(el);
-      var r = range.getBoundingClientRect();
+      var r = ctx.rect(range);
       el.style.left = marks[n].rect.left + (marks[n].rect.left - r.left) + "px";
       el.style.top = marks[n].rect.top + (marks[n].rect.top - r.top) + "px";
     });
@@ -219,11 +239,11 @@
     var OFFSTAGE_MS = 70; // beat spent out of frame before rising back in
 
     var c = ctx.clips;
-    var lead = c[0].getBoundingClientRect();
-    var mid = c[1].getBoundingClientRect();
-    var end = c[2].getBoundingClientRect();
+    var lead = ctx.rect(c[0]);
+    var mid = ctx.rect(c[1]);
+    var end = ctx.rect(c[2]);
 
-    var endShift = alignmentEdge(ctx.brand) - end.right;
+    var endShift = alignmentEdge(ctx) - end.right;
     var midShift = lead.right + (end.left + endShift - lead.right - mid.width) / 2 - mid.left;
     // Too narrow to open up: the shifts would go negative and pull the segments
     // backwards over each other. Sit still instead.
@@ -245,7 +265,7 @@
        would drift apart. */
     var gapToMid = mid.left + midShift - lead.right;
     var gapToEnd = end.left + endShift - (mid.right + midShift);
-    var toClear = window.innerWidth - (lead.left + gapToMid + gapToEnd) + 40;
+    var toClear = ctx.viewW - (lead.left + gapToMid + gapToEnd) + 40;
     var d = gapToMid + gapToEnd + toClear;
     /* Same curve as the spread, and the duration scaled by distance, so the two
        stages move at the same speed at every point of the curve rather than just
@@ -276,14 +296,16 @@
 
     // The glide ends 40px past the edge, so the last of it plays out unseen. Come
     // back in as soon as "milan" -- the trailing word -- is out of the window.
-    var goneAt = (window.innerWidth - lead.left) / d;
+    var goneAt = (ctx.viewW - lead.left) / d;
     await ctx.wait(timeAtProgress(EXPO_OUT, goneAt) * sweepMs + OFFSTAGE_MS);
     ctx.cancelAll();
     await rise(ctx);
   }
 
   /* Each letter slides right until the wordmark sits flush with the right edge of
-     the project list, and straight back home.
+     the project list, and straight back home. Turned into the side rail it goes
+     to the top of the window, then down to just above the rail's links, then
+     back home.
      It moves like an accordion: the letters leave one after another, from the
      right, spaced so "milan"'s "m" only sets off as ".com"'s "m" arrives, so the
      wordmark stretches across the page and closes up against the edge. Once that
@@ -299,22 +321,40 @@
   async function accordion(ctx) {
     var TRAVEL_MS = 520; // one letter's guide, from setting off to arriving
     var EDGE_HOLD_MS = 500; // the hold with them all closed up against the edge
+    var DOWN_TRAVEL_MS = 400; // one letter's guide on the long run from top to bottom
     var PERIOD_MS = 300; // the spring each letter hangs from: longer is looser
     var DAMPING = 0.8; // lower is bouncier -- below about 0.75 letters collide
     var STEP_MS = 0.25; // simulation step
     var FRAME_MS = 1000 / 120; // sampled for every frame a ProMotion display draws
 
+    // The side rail's route has an extra leg, so it moves quicker to take about as long.
+    if (ctx.rotated) {
+      TRAVEL_MS = 300;
+      EDGE_HOLD_MS = 180;
+      PERIOD_MS = 220;
+    }
+
     var letters = splitLetters(ctx);
     var n = letters.length;
-    var d = alignmentEdge(ctx.brand) - letters[n - 1].getBoundingClientRect().right;
+    var d = alignmentEdge(ctx) - ctx.rect(letters[n - 1]).right;
     if (d <= 0) {
       return; // no room to move on a viewport this narrow
     }
     // Landing at home overshoots past the wordmark's left edge; on a narrow window
     // it sits only a little way in. Keep it inside the window.
-    var roomLeft = Math.max(0, letters[0].getBoundingClientRect().left - 4);
+    var roomLeft = Math.max(0, ctx.rect(letters[0]).left - 4);
+    // In the side rail the far end is the top of the window; from there they run down
+    // to just above the rail's links (or the window's bottom) before coming home.
+    // Elsewhere they come straight home.
+    var dDown = 0;
+    if (ctx.rotated) {
+      var railLinks = ctx.brand.parentNode.querySelector(".side-rail-links");
+      var floor = railLinks ? ctx.rect(railLinks).right + 24 : 24;
+      dDown = Math.max(0, ctx.rect(letters[0]).left - floor);
+    }
 
     var stagger = TRAVEL_MS / (n - 1); // each end's last letter sets off as its first arrives
+    var downStagger = DOWN_TRAVEL_MS / (n - 1);
     var w = (2 * Math.PI) / PERIOD_MS;
     var stiffness = w * w;
     var friction = 2 * DAMPING * w;
@@ -339,25 +379,35 @@
       vel.push(0);
       samples.push([]);
     }
-    var homeAt = null; // the moment the last letter arrives; the return starts a hold later
+    var topAt = null; // the moment the last letter arrives at the far end; they leave a hold later
+    var bottomAt = null; // likewise at the bottom, in the side rail
     var nextFrame = 0;
     var t = 0;
-    for (; t < 8000; t += STEP_MS) {
+    for (; t < 12000; t += STEP_MS) {
       if (t >= nextFrame) {
         for (i = 0; i < n; i++) {
           samples[i].push({ t: t, pos: pos[i] });
         }
         nextFrame += FRAME_MS;
       }
-      if (homeAt === null && pos[0] >= d - 1.5) {
-        homeAt = t;
+      if (topAt === null && pos[0] >= d - 1.5) {
+        topAt = t;
+      }
+      if (dDown > 0 && topAt !== null && bottomAt === null && pos[n - 1] <= -dDown + 1.5) {
+        bottomAt = t;
       }
 
       var acc = [];
       for (i = 0; i < n; i++) {
+        // Out: the rightmost letter leads. Down (or home): the leftmost leads. Back up
+        // home from the bottom: the rightmost leads again.
         var out = smootherstep((t - (n - 1 - i) * stagger) / TRAVEL_MS);
-        var back = homeAt === null ? 0 : smootherstep((t - homeAt - EDGE_HOLD_MS - i * stagger) / TRAVEL_MS);
-        acc.push(stiffness * (d * (out - back) - pos[i]) - friction * vel[i]);
+        var down = topAt === null ? 0 : dDown > 0
+          ? smootherstep((t - topAt - EDGE_HOLD_MS - i * downStagger) / DOWN_TRAVEL_MS)
+          : smootherstep((t - topAt - EDGE_HOLD_MS - i * stagger) / TRAVEL_MS);
+        var up = bottomAt === null ? 0 : smootherstep((t - bottomAt - EDGE_HOLD_MS - (n - 1 - i) * stagger) / TRAVEL_MS);
+        var guide = d * out - (d + dDown) * down + dDown * up;
+        acc.push(stiffness * (guide - pos[i]) - friction * vel[i]);
       }
       // A letter can never get past its right-hand neighbour, whichever way
       // they're going: they all travel the same distance from touching.
@@ -369,7 +419,9 @@
           acc[i + 1] += push / 2;
         }
       }
-      var settled = homeAt !== null && t > homeAt + EDGE_HOLD_MS + (n - 1) * stagger + TRAVEL_MS;
+      var settled = dDown > 0
+        ? bottomAt !== null && t > bottomAt + EDGE_HOLD_MS + (n - 1) * stagger + TRAVEL_MS
+        : topAt !== null && t > topAt + EDGE_HOLD_MS + (n - 1) * stagger + TRAVEL_MS;
       for (i = 0; i < n; i++) {
         vel[i] += acc[i] * STEP_MS;
         pos[i] += vel[i] * STEP_MS;
@@ -409,7 +461,8 @@
      The wordmark sits near the top of the window, so passed words scroll up off
      the page and the upcoming ones show below. There's no room for the arrow in
      the left margin, so it slides in and nudges the words over while the wheel
-     turns, and slides away as the wordmark lands back exactly where it was. */
+     turns, jumps forward just before each step as if knocking the word on, and
+     slides away as the wordmark lands back exactly where it was. */
   async function wordWheel(ctx) {
     // DOT is drawn rather than typed: neither font has a solid circle, and the
     // fallback fonts' versions sit at the wrong size and height.
@@ -427,7 +480,12 @@
     var FADE = 0.45; // each word further out keeps this share of the opacity
     var BLUR_PX = 1.8; // blur added per word further out
     var LEAVE_BLUR_PX = 4; // blur the wordmark fades out through
-    var NUDGE_PX = 3; // how far the arrow gets pushed as the wheel turns
+    var POP_EM = 0.42; // how far the arrow jumps forward at each step
+    var POP_WINDUP = 0.8; // first it draws back, by this share of that distance...
+    var POP_WINDUP_MS = 170; // ...over this long
+    var POP_LEAD_MS = 110; // its jump, ending just as the wheel sets off
+    var POP_BACK_MS = 260; // and its settling back
+    var POP_PUSH = 0.45; // how much of that the word it hits gets knocked forward
     var FRAME_MS = 1000 / 120;
     var STEP_MS = 0.25;
 
@@ -447,14 +505,17 @@
 
     // Hide the real wordmark (it keeps its space) and lay the wheel over it.
     var position = brand.style.position;
-    brand.style.position = "relative";
+    // Positioned already (as in the side rail, where it's absolute): leave it be.
+    if (window.getComputedStyle(brand).position === "static") {
+      brand.style.position = "relative";
+    }
     ctx.clips.forEach(function (clip) {
       clip.style.visibility = "hidden";
     });
     var stage = document.createElement("span");
     stage.setAttribute("aria-hidden", "true");
     stage.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;";
-    var boxH = brand.getBoundingClientRect().height;
+    var boxH = ctx.rect(brand).height;
     var dotD = 0.5 * markH; // the dot: half the arrow's height, on the same line
     /* Room above and below each word for its ascenders and descenders. The
        wordmark's line-height is tight enough that a g or p hangs below the word's
@@ -515,7 +576,21 @@
       '<path fill="currentColor" d="M92.59,90.4H12.82s0-15.42,0-15.42h79.81s0-6.29,0-6.29l-7.72-1.03c-4.84-.65-8.87-3.29-12.42-6.55' +
       'l-14.17-13.51,10.99-10.88,47.57,45.96-47.52,45.98-11.05-10.84,14.59-14.02c3.81-3.27,8.14-5.64,13.19-6.28l6.61-.84-.1-6.27Z"/>';
     stage.appendChild(arrow);
-    brand.appendChild(stage);
+    if (ctx.rotated) {
+      // The side rail would crop the fan, so it's drawn on the layer over the whole page,
+      // where it gets none of the wordmark's type by inheritance.
+      var type = window.getComputedStyle(brand);
+      var mark = ctx.rect(brand);
+      stage.style.left = mark.left + "px";
+      stage.style.top = mark.top + "px";
+      stage.style.font = type.font;
+      stage.style.letterSpacing = type.letterSpacing;
+      stage.style.textTransform = type.textTransform;
+      stage.style.color = type.color;
+      ctx.host().appendChild(stage);
+    } else {
+      brand.appendChild(stage);
+    }
     ctx.defer(function () {
       stage.remove();
       brand.style.position = position;
@@ -543,7 +618,6 @@
     var pos = 0;
     var vel = 0;
     var samples = [];
-    var fastest = 1e-9;
     var nextFrame = 0;
     var t = 0;
     for (; t < 12000; t += STEP_MS) {
@@ -557,13 +631,29 @@
       }
       vel += (k * (target - pos) - c * vel) * STEP_MS;
       pos += vel * STEP_MS;
-      fastest = Math.max(fastest, Math.abs(vel));
       if (t > outroAt + OUTRO_MS && Math.abs(pos - last) < 0.002 && Math.abs(vel) < 0.00002) {
         break;
       }
     }
     samples.push({ t: t, pos: last, vel: 0 });
     var total = t;
+
+    // The arrow's move at each step, in shares of its jump: it draws back, then strikes
+    // just as the word sets off, so it looks like the arrow pops the word out.
+    function pop(time) {
+      var amount = 0;
+      stepAt.forEach(function (at) {
+        var since = time - at;
+        if (since < -POP_LEAD_MS) {
+          amount -= POP_WINDUP * smootherstep((since + POP_LEAD_MS + POP_WINDUP_MS) / POP_WINDUP_MS);
+        } else if (since < 0) {
+          amount += -POP_WINDUP + (1 + POP_WINDUP) * smootherstep((since + POP_LEAD_MS) / POP_LEAD_MS);
+        } else {
+          amount += 1 - smootherstep(since / POP_BACK_MS);
+        }
+      });
+      return amount;
+    }
 
     // The fan fading in. Only the intro: at the end the landed word stays.
     function fanIn(time) {
@@ -590,6 +680,7 @@
       var fan = fanIn(f.t);
       var p = presence(f.t);
       var shift = shiftFull * p;
+      var popPx = POP_EM * fontPx * pop(f.t) * p;
       lines.forEach(function (el, j) {
         var d = j - f.pos; // words from the arrow: negative above, positive below
         var near = Math.max(0, 1 - Math.abs(d)); // only the current word shows alone
@@ -599,14 +690,14 @@
         }
         lineFrames[j].push({
           offset: offset,
-          transform: "translateX(" + shift.toFixed(2) + "px) rotate(" + (d * perWord).toFixed(5) + "rad)",
+          transform: "translateX(" + (shift + Math.max(0, popPx) * POP_PUSH * near).toFixed(2) + "px) rotate(" + (d * perWord).toFixed(5) + "rad)",
           opacity: opacity.toFixed(4),
           filter: "blur(" + (BLUR_PX * Math.abs(d) * p).toFixed(3) + "px)"
         });
       });
       arrowFrames.push({
         offset: offset,
-        transform: "translateX(" + ((p - 1) * shiftFull + (NUDGE_PX * f.vel) / fastest).toFixed(2) + "px)",
+        transform: "translateX(" + ((p - 1) * shiftFull + popPx).toFixed(2) + "px)",
         opacity: p.toFixed(4)
       });
     });
@@ -632,6 +723,8 @@
      with a small give. Everything random resolves to nothing on landing.
      The wordmark sits only about 10px below the top of the window, so most
      letters shoot out past its top edge and float there before dropping back in.
+     Turned upright in the side rail, they still fall and burst straight up and down
+     the window.
      The letters fly in a layer over the whole window -- see liftLetters().
      Everything random is rolled fresh on every run. */
   async function fallPop(ctx) {
@@ -669,7 +762,7 @@
     var FRAME_MS = 1000 / 120;
 
     function rand(lo, hi) {
-      return lo + Math.random() * (hi - lo);
+      return lo + random() * (hi - lo);
     }
 
     function smootherstep(u) {
@@ -682,20 +775,30 @@
     var marks = lifted.marks;
     var copies = lifted.copies;
 
-    var viewH = window.innerHeight;
+    var viewH = ctx.viewH;
+    /* Turned into the side rail, the motion is worked out as if the wordmark were
+       lying flat and turned only on the way out (see place()), so the letters still
+       fall straight down the window and burst back up from below the wordmark. In
+       window terms: below is towards the turned frame's low x, sideways is its y. */
+    var rotated = ctx.rotated;
+    var wordBottom = Math.min.apply(null, marks.map(function (m) { return m.rect.left; }));
     // The cannon's muzzle: below the middle of the wordmark.
     var cannonX =
       (Math.min.apply(null, marks.map(function (m) { return m.rect.left; })) +
         Math.max.apply(null, marks.map(function (m) { return m.rect.right; }))) / 2;
     var cannonDepth = CANNON_CM * CM;
     var flights = marks.map(function (m) {
-      var drop = viewH - m.rect.top + m.rect.height + 20; // down to just out of view
+      var drop = rotated
+        ? m.rect.left + m.rect.width + 20
+        : viewH - m.rect.top + m.rect.height + 20; // down to just out of view
       var letGo = rand(0, FALL_SPREAD_MS);
-      var depth = cannonDepth; // reappears at the cannon, this far below its place
+      // Reappears at the cannon, this far below its place -- below the whole upright
+      // wordmark in the side rail.
+      var depth = rotated ? m.rect.left - wordBottom + cannonDepth : cannonDepth;
       var past = rand(PAST_MIN_EM, PAST_MAX_EM) * fontPx; // shoots this far past its place
       var dropMs = DROP_MS_PER_SQRT_PX * Math.sqrt(past);
       // A letter near the left edge can't drift out past it.
-      var leftRoom = Math.max(0, m.rect.left - 4);
+      var leftRoom = Math.max(0, (rotated ? m.rect.top : m.rect.left) - 4);
       var floatMs = FLOAT_MS + rand(-FLOAT_JITTER_MS, FLOAT_JITTER_MS);
       return {
         drop: drop,
@@ -709,12 +812,14 @@
         dropMs: dropMs,
         flightMs: APPEAR_MS + SHOOT_MS + floatMs + dropMs,
         landSpeed: (2 * past) / dropMs, // speed at the end of the drop, carried into the landing
-        flutterX: rand(0.5, 1) * FLUTTER_EM * fontPx * (Math.random() < 0.5 ? -1 : 1),
+        flutterX: rand(0.5, 1) * FLUTTER_EM * fontPx * (random() < 0.5 ? -1 : 1),
         flutterTurn: rand(0.5, 1) * FLUTTER_TURN,
         flutterCycles: rand(0.8, 1.4), // sways per second
         flutterPhase: rand(0, 2 * Math.PI),
         // from somewhere across the cannon's muzzle
-        startX: cannonX + rand(-0.5, 0.5) * CANNON_WIDTH_CM * CM - (m.rect.left + m.rect.width / 2),
+        startX: rotated
+          ? rand(-0.5, 0.5) * CANNON_WIDTH_CM * CM
+          : cannonX + rand(-0.5, 0.5) * CANNON_WIDTH_CM * CM - (m.rect.left + m.rect.width / 2),
         topX: Math.max(-leftRoom, rand(-SCATTER_EM, SCATTER_EM) * fontPx),
         floatX: rand(-FLOAT_DRIFT_EM, FLOAT_DRIFT_EM) * fontPx,
         startTilt: rand(-TILT, TILT),
@@ -798,6 +903,12 @@
           y = f.landSpeed * since * Math.exp(-since / ABSORB_MS);
         }
       }
+      if (rotated) {
+        // Down the window is the turned frame's -x, across it is its +y.
+        var down = y;
+        y = x;
+        x = -down;
+      }
       return {
         transform:
           "translate(" + x.toFixed(2) + "px, " + y.toFixed(2) + "px) rotate(" + r.toFixed(2) + "deg) scale(" +
@@ -870,7 +981,7 @@
     var dpr = window.devicePixelRatio || 1;
     var measure = document.createElement("canvas").getContext("2d");
     measure.font = font;
-    var viewH = window.innerHeight;
+    var viewH = ctx.viewH;
 
     /* Where a glyph is cut, from its pixels:
        - cuts: two rows to repeat, the best above and the best below the
@@ -1035,7 +1146,7 @@
       var room = LEG_VARIANCE - gap * (count - 1);
       var shares = [];
       for (var i = 0; i < count; i++) {
-        shares.push(Math.random() * room);
+        shares.push(random() * room);
       }
       shares.sort(function (a, b) {
         return a - b;
@@ -1044,7 +1155,7 @@
         return 1 - (share + i * gap);
       });
       for (i = shares.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
+        var j = Math.floor(random() * (i + 1));
         var tmp = shares[i];
         shares[i] = shares[j];
         shares[j] = tmp;
@@ -1053,7 +1164,7 @@
     }
 
     function reachLine(baseline) {
-      var reach = REACH_CM * CM * (1 - Math.random() * REACH_VARIANCE);
+      var reach = REACH_CM * CM * (1 - random() * REACH_VARIANCE);
       return Math.min(viewH, baseline + reach);
     }
 
@@ -1067,11 +1178,11 @@
       // sits with its bottom on the baseline.
       var range = document.createRange();
       range.selectNodeContents(el);
-      var penX = range.getBoundingClientRect().left;
+      var penX = ctx.rect(range).left;
       var marker = document.createElement("span");
       marker.style.cssText = "display:inline-block;width:0;height:0;";
       el.appendChild(marker);
-      var baseline = marker.getBoundingClientRect().bottom;
+      var baseline = ctx.rect(marker).bottom;
       marker.remove();
       var m = measure.measureText(ch);
 
@@ -1185,13 +1296,13 @@
       return n;
     });
     for (var i = order.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
+      var j = Math.floor(random() * (i + 1));
       var tmp = order[i];
       order[i] = order[j];
       order[j] = tmp;
     }
     var stretchAt = letters.map(function (_, n) {
-      return Math.max(0, n * STRETCH_STAGGER_MS + (Math.random() * 2 - 1) * STRETCH_JITTER_MS);
+      return Math.max(0, n * STRETCH_STAGGER_MS + (random() * 2 - 1) * STRETCH_JITTER_MS);
     });
     var holdEnd = Math.max.apply(null, stretchAt) + STRETCH_MS + HOLD_MS;
     var returnAt = [];
@@ -1271,10 +1382,10 @@
     }).join("");
     var range = document.createRange();
     range.selectNodeContents(brand);
-    var mark = range.getBoundingClientRect(); // the wordmark's text, as laid out
+    var mark = ctx.rect(range); // the wordmark's text, as laid out
     var fontPx = parseFloat(style.fontSize);
-    var viewW = window.innerWidth;
-    var viewH = window.innerHeight;
+    var viewW = ctx.viewW;
+    var viewH = ctx.viewH;
 
     /* Two layers over the window: one that blurs the page behind, at a fixed
        strength and faded in and out by its opacity, and above it the grid.
@@ -1291,7 +1402,7 @@
     layer.style.cssText = "position:absolute;inset:0;contain:layout paint;";
     root.appendChild(backdrop);
     root.appendChild(layer);
-    document.body.appendChild(root);
+    ctx.host().appendChild(root);
     ctx.clips.forEach(function (clip) {
       clip.style.visibility = "hidden";
     });
@@ -1323,7 +1434,7 @@
         el.style.top = "0px";
         var r = document.createRange();
         r.selectNodeContents(el);
-        var box = r.getBoundingClientRect();
+        var box = ctx.rect(r);
         offset = { x: box.left, y: box.top };
       }
       el.style.left = x - offset.x + "px";
@@ -1332,20 +1443,24 @@
     }
     copy(mark.left, mark.top).style.visibility = "visible"; // the wordmark's stand-in
 
-    // The grid: columns spread evenly between the wordmark's left margin and the
-    // same margin on the right, rows down from the wordmark.
+    // The grid: anchored on the wordmark and repeated at a steady pitch in every
+    // direction until it covers the whole window; copies at the edges are cut off
+    // by the layer.
     var gap = MIN_GAP_EM * fontPx;
-    var cols = Math.max(1, Math.floor((viewW - 2 * mark.left + gap) / (mark.width + gap)));
-    var colPitch = cols > 1 ? (viewW - 2 * mark.left - mark.width) / (cols - 1) : 0;
+    var colPitch = mark.width + gap;
     var rowPitch = ROW_PITCH * mark.height;
-    var rows = Math.floor((viewH - mark.top - mark.height) / rowPitch) + 1;
+    var colFrom = -Math.ceil(mark.right / colPitch);
+    var colTo = Math.ceil((viewW - mark.left) / colPitch);
+    var rowFrom = -Math.ceil(mark.bottom / rowPitch);
+    var rowTo = Math.ceil((viewH - mark.top) / rowPitch);
 
     var copies = []; // [row][col], the wordmark's own place empty
-    for (var r = 0; r < rows; r++) {
-      copies.push([]);
-      for (var c = 0; c < cols; c++) {
-        copies[r].push(r === 0 && c === 0 ? null : copy(mark.left + c * colPitch, mark.top + r * rowPitch));
+    for (var r = rowFrom; r < rowTo; r++) {
+      var line = [];
+      for (var c = colFrom; c < colTo; c++) {
+        line.push(r === 0 && c === 0 ? null : copy(mark.left + c * colPitch, mark.top + r * rowPitch));
       }
+      copies.push(line);
     }
 
     // The frames, worked out up front as a list of changes to make: how much of
@@ -1364,27 +1479,27 @@
         if (!el) {
           return;
         }
-        if (Math.random() < FLICKERY) {
+        if (random() < FLICKERY) {
           flickery.add(el);
         } else {
           // Steady: on once at a random moment, off once at another.
-          show(el, IN_MS * Math.pow(Math.random(), 1 / ACCEL), 1);
-          show(el, IN_MS + HOLD_MS + OUT_MS * Math.random(), 0);
+          show(el, IN_MS * Math.pow(random(), 1 / ACCEL), 1);
+          show(el, IN_MS + HOLD_MS + OUT_MS * random(), 0);
         }
       });
     });
     function flickerFrame(t, chance) {
-      var screen = Math.random() < DIP ? -0.8 : Math.random() < FLASH ? 0.5 : 0;
+      var screen = random() < DIP ? -0.8 : random() < FLASH ? 0.5 : 0;
       copies.forEach(function (row) {
-        var rowShift = (Math.random() * 2 - 1) * ROW_JITTER;
+        var rowShift = (random() * 2 - 1) * ROW_JITTER;
         row.forEach(function (el) {
           if (!flickery.has(el)) {
             return;
           }
           // Dips, flashes and row flicker scale with the chance, so they
           // don't bring on a crowd while it's still meant to be a few.
-          var on = Math.random() < chance + (screen + rowShift) * Math.min(1, 2 * chance);
-          show(el, t, !on ? 0 : Math.random() < GLITCH ? 0.15 + 0.7 * Math.random() : 1);
+          var on = random() < chance + (screen + rowShift) * Math.min(1, 2 * chance);
+          show(el, t, !on ? 0 : random() < GLITCH ? 0.15 + 0.7 * random() : 1);
         });
       });
     }
@@ -1526,15 +1641,73 @@
        defer(fn)                       run fn once the animation has finished,
                                        to undo anything it changed besides
                                        animations -- e.g. splitLetters() */
-  function createContext(brand, clips, segs) {
+  function createContext(brand, clips, segs, skipMs) {
     var tracked = [];
     var deferred = [];
+    /* A run carried over from the previous page starts skipMs in. Its script replays
+       from the top, but on a clock of its own (scriptMs, how far along it has got):
+       anything it starts is moved on to where it would be by now, and waits for
+       what's already past return at once, so it lands exactly mid-flight. */
+    var resuming = skipMs > 0;
+    var originMs = window.performance.now() - (skipMs || 0);
+    var scriptMs = 0;
+    /* In the side rail (the home page) the wordmark is turned 90° to read upwards. The
+       animations then work in a frame turned with it: rect() converts what they
+       measure into that frame, viewW/viewH are the window's size in it, and host()
+       is a window-sized stage turned the same way for the layers they draw on -- so
+       everything they do appears turned along with the wordmark, unchanged. In that
+       frame x runs up the window from its bottom edge and y runs left to right. */
+    var rotated = !!(brand.closest && brand.closest(".side-rail"));
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var stage = null;
     return {
       brand: brand,
       clips: clips,
       segs: segs,
+      rotated: rotated,
+      viewW: rotated ? vh : vw,
+      viewH: rotated ? vw : vh,
+      rect: function (target) {
+        var r = target.getBoundingClientRect();
+        if (!rotated) {
+          return r;
+        }
+        return {
+          left: vh - r.bottom,
+          right: vh - r.top,
+          top: r.left,
+          bottom: r.right,
+          width: r.height,
+          height: r.width,
+          x: vh - r.bottom,
+          y: r.left
+        };
+      },
+      host: function () {
+        if (!rotated) {
+          return document.body;
+        }
+        if (!stage) {
+          stage = document.createElement("div");
+          stage.setAttribute("aria-hidden", "true");
+          stage.style.cssText =
+            "position:fixed;pointer-events:none;z-index:2147483000;transform:rotate(-90deg);" +
+            "left:" + (vw - vh) / 2 + "px;top:" + (vh - vw) / 2 + "px;width:" + vh + "px;height:" + vw + "px;";
+          document.body.appendChild(stage);
+          deferred.push(function () {
+            stage.remove();
+            stage = null;
+          });
+        }
+        return stage;
+      },
       animate: function (el, keyframes, timing) {
         var a = el.animate(keyframes, timing);
+        a.scriptEndMs = scriptMs + (timing.delay || 0) + (timing.duration || 0);
+        if (resuming) {
+          a.currentTime = Math.max(0, window.performance.now() - originMs - scriptMs);
+        }
         tracked.push(a);
         return a;
       },
@@ -1544,11 +1717,18 @@
             // finished rejects when an animation is cancelled; that is not an error.
             return a.finished.catch(function () {});
           })
-        );
+        ).then(function (results) {
+          animations.forEach(function (a) {
+            scriptMs = Math.max(scriptMs, a.scriptEndMs);
+          });
+          return results;
+        });
       },
       wait: function (ms) {
+        scriptMs += ms;
+        var due = resuming ? Math.max(0, originMs + scriptMs - window.performance.now()) : ms;
         return new Promise(function (resolve) {
-          window.setTimeout(resolve, ms);
+          window.setTimeout(resolve, due);
         });
       },
       cancelAll: function () {
@@ -1591,6 +1771,7 @@
     var last = null;
     var forced = null;
     var current = null; // the run playing, as a promise that settles when it's done
+    var running = null; // what the next page needs to carry it on: name, seed, start
 
     function pick() {
       if (forced) {
@@ -1633,13 +1814,22 @@
       });
     }
 
-    function run(name) {
+    function newSeed() {
+      return Math.floor(Math.random() * 4294967296);
+    }
+
+    // carried: where a run from the previous page had got to, if this continues one.
+    function run(name, carried) {
       if (!name || playing) {
         return Promise.resolve(false);
       }
       playing = true;
       last = name;
-      var ctx = createContext(brand, clips, segs);
+      var seed = carried ? carried.seed : newSeed();
+      var startedAt = carried && carried.startedAt ? carried.startedAt : Date.now();
+      running = { name: name, seed: seed, startedAt: startedAt };
+      random = seededRandom(seed);
+      var ctx = createContext(brand, clips, segs, Date.now() - startedAt);
       if (forced) {
         console.info('[wordmark] playing "' + name + '"');
       }
@@ -1655,7 +1845,10 @@
           ctx.cleanUp();
           playing = false;
           current = null;
-          armed = !cursorOnWordmark();
+          running = null;
+          // With no cursor seen yet (just arrived from a click, say), it may still be
+          // resting on the wordmark: wait until it's been seen away from it.
+          armed = pointer ? !cursorOnWordmark() : false;
           return true;
         });
       return current;
@@ -1694,9 +1887,14 @@
         }
         return forced;
       },
-      // Settles once the run playing now has finished, or straight away.
-      settled: function () {
-        return current || Promise.resolve();
+      // What the next page should play: the run going on now, or a fresh one that
+      // starts when it gets there (no startedAt).
+      handover: function () {
+        var name = running ? running.name : pick();
+        return running || (name ? { name: name, seed: newSeed() } : null);
+      },
+      resume: function (carried) {
+        return isKnown(carried.name) ? run(carried.name, carried) : Promise.resolve(false);
       },
       // No hovering until the cursor has been seen away from the wordmark.
       disarm: function () {
@@ -1712,34 +1910,44 @@
     }
     var player = createPlayer(brand);
 
-    /* The wordmark links home. Clicked mid-animation, it lets the animation
-       finish before following the link, rather than cutting it off. And the
-       page it lands on opens with the cursor resting on its wordmark, which
-       would start a fresh animation straight away -- so it's told, and waits
-       until the cursor has been off the wordmark first. */
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+    var noHover = !!(reduced && reduced.matches);
+
+    /* The wordmark links home. Clicking it goes there straight away and the animation
+       plays on the page it lands on. If one is already running, the new page picks it
+       up where it has got to, as the same run (see createContext()), so it carries on
+       across the page change. That page also opens with the cursor resting on its
+       wordmark, which must not start another: it waits until the cursor has been off
+       the wordmark first. */
     var ARRIVED = "wordmark-arrived";
+    var CARRY_LIMIT_MS = 20000; // older than any run: a stale note, not a page change
+    var carried = null;
     try {
-      if (window.sessionStorage.getItem(ARRIVED)) {
+      var note = window.sessionStorage.getItem(ARRIVED);
+      if (note) {
         window.sessionStorage.removeItem(ARRIVED);
+        carried = JSON.parse(note);
         player.disarm();
       }
     } catch (err) {
       // Storage blocked: the next page may start an animation on arrival.
     }
+    if (carried && carried.name && !(carried.startedAt && Date.now() - carried.startedAt > CARRY_LIMIT_MS)) {
+      // The animations measure the type, so wait for its font.
+      brand.getBoundingClientRect();
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
+        player.resume(carried);
+      });
+    }
     brand.addEventListener("click", function (e) {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-        return; // opening in a new tab or window: nothing to wait for
+        return; // opening in a new tab or window: nothing to carry over
       }
       try {
-        window.sessionStorage.setItem(ARRIVED, "1");
+        window.sessionStorage.setItem(ARRIVED, JSON.stringify(noHover ? {} : player.handover()));
       } catch (err) {
         // Storage blocked: see above.
       }
-      e.preventDefault();
-      var href = brand.href;
-      player.settled().then(function () {
-        window.location.href = href;
-      });
     });
 
     var fromUrl = new URLSearchParams(window.location.search).get("wordmark") || WORKING_ON;
@@ -1762,8 +1970,7 @@
 
     // Hovering is off for visitors who asked for reduced motion; the console
     // helpers above still work, so it can be tested with that setting on.
-    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!(reduced && reduced.matches)) {
+    if (!noHover) {
       brand.addEventListener("mouseenter", player.hover);
     }
   }

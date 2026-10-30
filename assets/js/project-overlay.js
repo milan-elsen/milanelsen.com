@@ -774,6 +774,74 @@
           );
         }
 
+        function neighbourSubtitle(delta) {
+          if (galleryItems.length < 2) {
+            return "";
+          }
+          var item = galleryItems[(galleryIndex + delta + galleryItems.length) % galleryItems.length];
+          return item && item.subtitle ? String(item.subtitle).trim() : "";
+        }
+
+        /* Captioned gallery pictures are a caption line shorter (see the max-height rule for
+           .project-overlay-gallery-image in site.css). While a picture slides in, its caption
+           is already shown where it will end up, and the outgoing picture keeps its size, so
+           nothing resizes once the slide lands. */
+        function galleryCaptionHeight(text) {
+          if (!galleryCaptionEl || !text) {
+            return 0;
+          }
+          var frame = galleryCaptionEl.parentNode;
+          var probe = galleryCaptionEl.cloneNode(false);
+          probe.hidden = false;
+          probe.textContent = text;
+          probe.style.cssText = "position:absolute;visibility:hidden;left:0;right:0;";
+          frame.appendChild(probe);
+          var probeStyle = window.getComputedStyle(probe);
+          var height = probe.offsetHeight +
+            (parseFloat(probeStyle.marginTop) || 0) + (parseFloat(probeStyle.marginBottom) || 0) +
+            (parseFloat(window.getComputedStyle(frame).rowGap) || 0);
+          frame.removeChild(probe);
+          return height;
+        }
+
+        /* The gallery image grows to fill the frame (less its caption) and draws the picture
+           centred inside with object-fit: contain, so a sliding picture gets that same box. */
+        function galleryIncomingHeight(delta) {
+          var available = galleryImageEl.parentNode.clientHeight - galleryCaptionHeight(neighbourSubtitle(delta));
+          return available > 0 ? available : 0;
+        }
+
+        function galleryCaptionForSlide(delta, incoming) {
+          if (!galleryCaptionEl) {
+            return;
+          }
+          galleryImageEl.style.width = galleryImageEl.offsetWidth + "px";
+          galleryImageEl.style.height = galleryImageEl.offsetHeight + "px";
+          galleryImageEl.style.maxHeight = "none";
+          var text = neighbourSubtitle(delta);
+          galleryCaptionEl.textContent = text;
+          galleryCaptionEl.hidden = !text;
+          if (text) {
+            var top = (incoming ? incoming.offsetTop + incoming.offsetHeight : galleryImageEl.offsetTop + galleryImageEl.offsetHeight) +
+              (parseFloat(window.getComputedStyle(galleryCaptionEl.parentNode).rowGap) || 0);
+            galleryCaptionEl.style.position = "absolute";
+            galleryCaptionEl.style.left = "0";
+            galleryCaptionEl.style.right = "0";
+            galleryCaptionEl.style.top = top + "px";
+          }
+        }
+
+        function releaseGallerySlide() {
+          galleryImageEl.style.removeProperty("width");
+          galleryImageEl.style.removeProperty("height");
+          galleryImageEl.style.removeProperty("max-height");
+          if (galleryCaptionEl) {
+            ["position", "left", "right", "top"].forEach(function (name) {
+              galleryCaptionEl.style.removeProperty(name);
+            });
+          }
+        }
+
         function neighbourSource(delta) {
           if (galleryItems.length < 2) {
             return "";
@@ -873,7 +941,25 @@
             peek.src = src;
             imgEl.parentNode.appendChild(peek);
             peekDelta = delta;
+            sizePeek(peek, delta);
             return peek;
+          }
+
+          /* Gives the peek the box the picture will have once it is the current one (see
+             options.incomingHeight), so nothing resizes when it lands. */
+          function sizePeek(image, delta) {
+            if (!options.incomingHeight) {
+              return;
+            }
+            whenDecoded(image, 1500).then(function () {
+              if (image !== peek || !image.naturalWidth) {
+                return;
+              }
+              var height = options.incomingHeight(delta, image.naturalWidth / image.naturalHeight);
+              if (height) {
+                image.style.height = height + "px";
+              }
+            });
           }
 
           function place(offset) {
@@ -930,6 +1016,9 @@
                 return;
               }
               options.commit(delta);
+              if (options.slideEnd) {
+                options.slideEnd();
+              }
               if (!leftover) {
                 return;
               }
@@ -944,6 +1033,9 @@
             }
 
             settling = complete;
+            if (commit && options.slideStart) {
+              options.slideStart(delta, peek);
+            }
             if (!duration || !imgEl.animate) {
               complete();
               return;
@@ -994,6 +1086,12 @@
             whenDecoded(incoming, 250).then(function () {
               if (!started) {
                 started = true;
+                if (options.incomingHeight && incoming.naturalWidth) {
+                  var height = options.incomingHeight(delta, incoming.naturalWidth / incoming.naturalHeight);
+                  if (height) {
+                    incoming.style.height = height + "px";
+                  }
+                }
                 settle(0, delta, true, 0);
               }
             });
@@ -1731,8 +1829,8 @@
           }, closeAnimationMs);
         }
 
+        // The cards are deliberately left out of the Tab order (no tabindex).
         document.querySelectorAll(".home-page .project-card").forEach(function (card) {
-          card.setAttribute("tabindex", "0");
           card.setAttribute("role", "button");
           card.setAttribute("aria-haspopup", "dialog");
 
@@ -1813,7 +1911,10 @@
             commit: stepGallery,
             enabled: function () {
               return !isLightboxOpen;
-            }
+            },
+            incomingHeight: galleryIncomingHeight,
+            slideStart: galleryCaptionForSlide,
+            slideEnd: releaseGallerySlide
           });
           galleryCarousel.attach(galleryImageEl);
 

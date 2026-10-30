@@ -20,7 +20,7 @@
 </head>
 <body class="project-page privacy-page">
   <header class="nav reveal" aria-label="Primary">
-    <div class="nav-inner site"><a class="brand" href="../index.html"><span class="brand-clip"><span class="brand-seg">milan</span></span><span class="brand-clip"><span class="brand-seg">elsen</span></span><span class="brand-clip"><span class="brand-seg">.com</span></span></a></div>
+    <div class="nav-inner site"></div>
   </header>
   <div class="header-burger menu-overlay-has-visible-non-navigation-items" data-animation-role="header-element">
     <button class="header-burger-btn burger" data-test="header-burger" aria-expanded="false">
@@ -75,11 +75,15 @@
   </div>
 
   <aside class="side-rail" aria-label="Contact and links">
-    <a class="side-rail-email" href="mailto:milan@milanelsen.com">milan@milanelsen.com</a>
-    <div class="side-rail-links">
-      <a href="../socials/index.html">Socials</a>
-      <a href="../imprint/index.html">Imprint</a>
-      <a href="../privacy-policy/index.html">Privacy</a>
+    <!-- The same sidebar as on the home page: the wordmark turned 90° in place of the
+         email, its hover animations turned with it (see brand-wordmark.js). -->
+    <div class="side-rail-sticky">
+      <a class="brand side-rail-email" href="../index.html"><span class="brand-clip"><span class="brand-seg">milan</span></span><span class="brand-clip"><span class="brand-seg">elsen</span></span><span class="brand-clip"><span class="brand-seg">.com</span></span></a>
+      <div class="side-rail-links">
+        <a href="../socials/index.html">Socials</a>
+        <a href="../imprint/index.html">Imprint</a>
+        <a href="../privacy-policy/index.html">Privacy</a>
+      </div>
     </div>
   </aside>
 
@@ -132,7 +136,17 @@
           return;
         }
 
-        email.style.top = "44%";
+        // The wordmark is turned 90° and centred on its top, so its turned box runs half its
+        // length either side: put its upper end level with the top of the page's content.
+        var first = Array.prototype.find.call(document.querySelectorAll("#content *"), function (el) {
+          return !el.closest(".visually-hidden") && el.getBoundingClientRect().height > 0;
+        });
+        if (!first) {
+          email.style.top = "44%";
+          return;
+        }
+        var contentTop = first.getBoundingClientRect().top + window.scrollY;
+        email.style.top = (contentTop + email.offsetWidth / 2) + "px";
       }
 
       function pinBurgerToViewport() {
